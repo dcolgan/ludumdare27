@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Log In{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4 col-lg-offset-4">
+            <div class="well">
+                <h1>Log In</h1>
+
+                {% if form.non_field_errors %}
+                <p class="errorlist">Invalid username or password.</p>
+                {% endif %}
+
+                <form action="" method="POST">{% csrf_token %}
+                    <div class="form-group">
+                        <label>Username <small><em>Who are you?</em></small></label>
+                        {{ form.username|attr:'placeholder:username'|add_class:"form-control" }}
+                        {{ form.username.errors }}
+                    </div>
+                    <div class="form-group">
+                        <label>Password <small><em>How do I know it's you?</em></small></label>
+                        {{ form.password|attr:'placeholder:password'|add_class:"form-control" }}
+                        {{ form.password.errors }}
+                    </div>
+                    <input type="submit" class="btn btn-success" value="Log In" />
+                </form>
+                <br/>
+                <p><a href="{% url 'create-account' %}">Or Create an Account</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

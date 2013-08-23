@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load custom_tags %}
+{% block title %}Play that Game{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block goesinfoot %}
+{% endblock %}
+
+{% block body_class %}game{% endblock %}
+
+{% block game_toolbar %}
+<div class="navbar-btn btn-group action-buttons">
+    <button class="btn btn-success btn-action" type="button" data-action="something"><img src="{{ STATIC_URL }}images/something.png" />  Do Something</button>
+    <button class="btn btn-success btn-action" type="button" data-action="something"><img src="{{ STATIC_URL }}images/something.png"/> Do Something Else</button>
+</div>
+
+<div class="navbar-btn btn-group action-buttons">
+    <button class="btn btn-success btn-action" type="button" data-action="something"><img src="{{ STATIC_URL }}images/something.png"/> Do Something Else</button>
+</div>
+{% endblock %}
+
+
+
+{% block content %}
+
+<div id="board"></div>
+
+{% endblock %}

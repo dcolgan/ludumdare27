@@ -1,0 +1,7 @@
+*.swp
+*.swo
+*.pyc
+*.sqlite
+*.stackdump
+env
+localsettings.py
