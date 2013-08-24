@@ -1,0 +1,152 @@
+10 seconds
+
+Everybody can create an account
+Everybody plays at once
+the game updates every 10 seconds
+every 10 seconds something happpens
+your stats change
+your character gets more something
+random thing happens every 10 secotnds
+new match happens every 10 seconds
+
+one round every 10 seconds
+each player of 100s can play the 10 second thing
+
+everybody does something in 10 seconds
+
+there is a 5 minute period between rounds
+
+timer in the corner that says how long till the next round
+the gameplay will take place in the prep time where you make decisions
+and in the 10 seconds where you see what happens
+
+you have a saved state in the game that is updated during the 10 second matches
+
+
+every account needs a ladder ranking
+
+10 seconds are not real time
+
+every time you play a round, it is as if you have played 10 more seconds
+your total time count adds up
+it is only added to your total when join a match, which you can do during the 5 minute prep sessions
+
+a thing in life where
+you have a group of stuff that is your pile
+the pile of stuff determines how you perform in the thing you are doing
+stuff happens at a fast pace in the thing you are doing
+
+take a game that happens in real time and requires twitch reflexes
+break that game down into 10 second intervals
+make the game a rpg
+
+1-2 minute turns - you select an action
+then the game updates and 10 simulated seconds go by
+
+if you are not there, your score doesn't change
+
+paintball/laser tag
+
+two people are having matches
+two poeple are randomly assigned each other for a match based on their ladder ranking
+
+you have 10 seconds worth of actions, you specify which things the person on your team does for 10 seconds
+
+turning takes 1 second, moving takes 2 seconds, firing takes 1 second, idle
+x steps = x steps / 2
+
+paint ball / laser tag
+
+
+what if there were 2 huge infinitely sized teams
+
+
+you only control one player and can only see one screen's worth of tiles
+
+you can only see in front of you 10 squares and 5 on either side
+
+types of squares:
+    grass - normal
+    road - running takes one stamina instead of 2
+    tree, rock, building - blocks view and impassable
+    water - can't run, walking takes stamina, if you are stuck in water, you have to rest
+    cornfield - can't see through, have to be next to someone to see them, can't run
+    rocks
+    roads
+
+you can see the terrain but you can't see other people unless you can see them
+
+each second happens for everyone at the same time
+
+you can look in any of the 4 directions, 90 degree turn takes 1 second, 180 turn takes 2 seconds
+walking takes 2 seconds per square
+
+actions:
+    walk = move 1 square, costs 1 second per square
+    run = move 2 squares, costs 1 seconds per 2 squares, 2 stamina for 1 second of running
+
+max 20 stamina
+stamina is restored for every second you stand
+
+stamina meter
+
+
+during the resolve phase, the game is stepped 1 second at a time for 10 seconds, and everyones actions happen,
+if an offensive player is on the same square as a defensive player, that player is captured, and sent to the jail/ back to their base, so there is no waiting on someone to rescue you
+
+
+add chat between players on the same team
+
+have chat messages that are seen after the 10 seconds are up
+
+you also have a hearing radius and that determines who you can hear
+you can type a message on every 2 minute turn, that you broadcast to everyone around you
+friendly and enemy players can hear you
+
+CTF in a large area
+you are put on a team when you decide to start playing
+you are put at your base
+
+------------------
+        |
+o       |        o
+        |
+        |
+        |
+o       |
+        |        o
+        |
+        |
+        |
+o       |
+        |
+        |        o
+        |
+        |
+        |
+o       |
+        |        o
+        |
+        |
+        |
+        |
+o       |        o
+        |
+        |
+        |
+        |
+o       |        o
+        |
+        |
+        |
+        |
+        |        o
+o       |
+        |
+        |
+        |
+o       |        o
+        |
+        |
+        |
+------------------
