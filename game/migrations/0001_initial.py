@@ -16,10 +16,10 @@ class Migration(SchemaMigration):
             ('is_superuser', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('username', self.gf('django.db.models.fields.CharField')(unique=True, max_length=255)),
             ('email', self.gf('django.db.models.fields.EmailField')(max_length=75, blank=True)),
-            ('color', self.gf('django.db.models.fields.CharField')(max_length=10, blank=True)),
-            ('leader_name', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('people_name', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('unplaced_units', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('team', self.gf('django.db.models.fields.CharField')(max_length=2, blank=True)),
+            ('has_flag', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('col', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('row', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('is_staff', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('is_active', self.gf('django.db.models.fields.BooleanField')(default=True)),
             ('date_joined', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
@@ -44,6 +44,25 @@ class Migration(SchemaMigration):
         ))
         db.create_unique(m2m_table_name, ['account_id', 'permission_id'])
 
+        # Adding model 'Move'
+        db.create_table(u'game_move', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('account', self.gf('django.db.models.fields.related.ForeignKey')(related_name='moves', to=orm['game.Account'])),
+            ('next', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='previous', null=True, to=orm['game.Move'])),
+            ('which', self.gf('django.db.models.fields.CharField')(max_length=10)),
+        ))
+        db.send_create_signal(u'game', ['Move'])
+
+        # Adding model 'Square'
+        db.create_table(u'game_square', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('col', self.gf('django.db.models.fields.IntegerField')()),
+            ('row', self.gf('django.db.models.fields.IntegerField')()),
+            ('terrain_type', self.gf('django.db.models.fields.CharField')(max_length=10)),
+            ('tile', self.gf('django.db.models.fields.IntegerField')()),
+        ))
+        db.send_create_signal(u'game', ['Square'])
+
 
     def backwards(self, orm):
         # Deleting model 'Account'
@@ -54,6 +73,12 @@ class Migration(SchemaMigration):
 
         # Removing M2M table for field user_permissions on 'Account'
         db.delete_table(db.shorten_name(u'game_account_user_permissions'))
+
+        # Deleting model 'Move'
+        db.delete_table(u'game_move')
+
+        # Deleting model 'Square'
+        db.delete_table(u'game_square')
 
 
     models = {
@@ -79,21 +104,36 @@ class Migration(SchemaMigration):
         },
         u'game.account': {
             'Meta': {'object_name': 'Account'},
-            'color': ('django.db.models.fields.CharField', [], {'max_length': '10', 'blank': 'True'}),
+            'col': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
+            'has_flag': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'leader_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'people_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'unplaced_units': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'row': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'team': ('django.db.models.fields.CharField', [], {'max_length': '2', 'blank': 'True'}),
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'})
+        },
+        u'game.move': {
+            'Meta': {'object_name': 'Move'},
+            'account': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'moves'", 'to': u"orm['game.Account']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'next': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'previous'", 'null': 'True', 'to': u"orm['game.Move']"}),
+            'which': ('django.db.models.fields.CharField', [], {'max_length': '10'})
+        },
+        u'game.square': {
+            'Meta': {'object_name': 'Square'},
+            'col': ('django.db.models.fields.IntegerField', [], {}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'row': ('django.db.models.fields.IntegerField', [], {}),
+            'terrain_type': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
+            'tile': ('django.db.models.fields.IntegerField', [], {})
         }
     }
 

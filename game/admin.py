@@ -10,7 +10,7 @@ class AccountCreationForm(forms.ModelForm):
 
     class Meta:
         model = Account
-        fields = ('username', 'email', 'color', 'leader_name', 'people_name')
+        fields = ('username', 'email', )
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -56,9 +56,9 @@ class AccountAdmin(UserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ('username', 'email', 'is_superuser', 'last_login', 'date_joined')
+    list_display = ('username', 'email', 'is_superuser', 'last_login', 'date_joined', 'col', 'row')
     fieldsets = (
-        (None, {'fields': ('username', 'email', 'password')}),
+        (None, {'fields': ('username', 'email', 'password', 'col', 'row')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
@@ -71,4 +71,11 @@ class AccountAdmin(UserAdmin):
     search_fields = ('username', 'email')
     ordering = ('username', 'email')
 
+
+class SquareAdmin(admin.ModelAdmin):
+    list_display = ('col', 'row', 'terrain_type', 'tile')
+    class Meta:
+        model = Square
+
 admin.site.register(Account, AccountAdmin)
+admin.site.register(Square, SquareAdmin)

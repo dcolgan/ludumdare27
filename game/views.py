@@ -48,15 +48,22 @@ def create_account(request):
             #        'account': account,
             #    })
             return HttpResponseRedirect(reverse('settings'))
-
     else:
         form = CreateAccountForm()
     return render(request, 'create-account.html', locals())
 
 @login_required
 def game(request):
-    return render(request, 'game.html', locals())
+    rows = []
+    for row in range(request.user.row-7, request.user.row+8):
+        squares = (Square.objects.
+            filter(col__gte=request.user.col-7).
+            filter(col__lte=request.user.col+7).
+            filter(row=request.user.row+7).
+            order_by('col'))
+        rows.append(rows)
 
+    return render(request, 'game.html', locals())
 
 class AccountAPIView(RetrieveAPIView, ListAPIView):
     permission_classes = (IsAuthenticated,)

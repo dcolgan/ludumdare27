@@ -7,12 +7,16 @@ import math
 import ipdb
 
 class Account(AbstractBaseUser, PermissionsMixin):
+    TEAMS = (
+        ('red', 'red'),
+        ('blue', 'blue'),
+    )
     username = models.CharField(max_length=255, unique=True)
     email = models.EmailField(blank=True)
-    color = models.CharField(max_length=10, blank=True)
-    leader_name = models.CharField(max_length=255, blank=True)
-    people_name = models.CharField(max_length=255, blank=True)
-    unplaced_units = models.IntegerField(default=0)
+    team = models.CharField(max_length=2, choices=TEAMS, blank=True)
+    has_flag = models.BooleanField(default=False)
+    col = models.IntegerField(null=True, blank=True)
+    row = models.IntegerField(null=True, blank=True)
 
     is_staff = models.BooleanField(default=False, help_text='Designates whether the user can log into this admin site.')
     is_active = models.BooleanField(default=True, help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.')
@@ -22,7 +26,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['email']
 
     class Meta:
         verbose_name = 'account'
@@ -57,15 +61,34 @@ class Account(AbstractBaseUser, PermissionsMixin):
 #class ObjectManager(models.Manager):
 #    def method(self):
 #        pass
-#
-#class Object(models.Model):
-#    owner = models.ForeignKey(Account, related_name='units')
-#    square = models.ForeignKey(Square, related_name='units')
-#    amount = models.IntegerField()
-#    last_turn_amount = models.IntegerField(default=0)
-#
-#    objects = ObjectManager()
-#
-#    def __unicode__(self):
-#        return unicode(self.square)
 
+
+class Move(models.Model):
+    MOVE_CHOICES = (
+        ('walk', 'Walk'),
+        ('run', 'Run'),
+        ('left', 'Turn Left'),
+        ('right', 'Turn Right'),
+        ('reverse', 'Turn Around'),
+    )
+    account = models.ForeignKey(Account, related_name='moves')
+    next = models.ForeignKey('self', blank=True, null=True, related_name='previous')
+    which = models.CharField(max_length=10, choices=MOVE_CHOICES)
+    
+
+class Square(models.Model):
+    TERRAIN_TYPES = (
+        ('grass', 'grass'),
+        ('dirt', 'dirt'),
+        ('water', 'water'),
+        ('corn', 'corn'),
+        ('tree', 'tree'),
+        ('rock', 'rock'),
+        ('building', 'building'),
+        ('shrubbery', 'shrubbery'),
+        ('road', 'road'),
+    )
+    col = models.IntegerField()
+    row = models.IntegerField()
+    terrain_type = models.CharField(max_length=10, choices=TERRAIN_TYPES)
+    tile = models.IntegerField()

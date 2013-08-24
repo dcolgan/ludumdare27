@@ -17,21 +17,6 @@
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css">
 </head>
 <body class="{% block body_class %}{% endblock %}">
-    <div class="navbar navbar-inverse">
-        {% if request.user.is_authenticated %}
-        <a class="navbar-brand" href="{% url 'game' %}">Ludum Dare 27: The Game&nbsp;</a>
-        {% else %}
-        <a class="navbar-brand" href="{% url 'home' %}">Ludum Dare 27: The Game&nbsp;</a>
-        {% endif %}
-        {% block game_toolbar %}{% endblock %}
-        <ul class="nav navbar-nav pull-right">
-            {% if request.user.is_authenticated %}
-            <li><a href="{% url 'logout' %}">Log Out</a></li>
-            {% else %}
-            <li><a href="{% url 'login' %}">Log In</a></li>
-            {% endif %}
-        </ul>
-    </div>
 
     {% block content %}{% endblock %}
 
@@ -42,8 +27,6 @@
     <script src="{{ STATIC_URL }}js/jquery.cookie.js"></script>
     <script src="{{ STATIC_URL }}js/knockout-2.3.0.js"></script>
     <script src="{{ STATIC_URL }}js/custom-knockout-bindings.js"></script>
-    <script src="{{ STATIC_URL }}js/spin.min.js"></script>
-    <script src="{{ STATIC_URL }}js/system.js"></script>
     <script src="{{ STATIC_URL }}js/all-pages.js"></script>
     {% block foot %}{% endblock %}
 </body>

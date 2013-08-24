@@ -1,0 +1,38 @@
+{ "height":75,
+ "layers":[
+        {
+         "height":75,
+         "name":"Tile Layer 1",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":50,
+         "x":0,
+         "y":0
+        }],
+ "orientation":"orthogonal",
+ "properties":
+    {
+
+    },
+ "tileheight":48,
+ "tilesets":[
+        {
+         "firstgid":1,
+         "image":"ld27-tileset.png",
+         "imageheight":480,
+         "imagewidth":480,
+         "margin":0,
+         "name":"ld27-tileset",
+         "properties":
+            {
+
+            },
+         "spacing":0,
+         "tileheight":48,
+         "tilewidth":48
+        }],
+ "tilewidth":48,
+ "version":1,
+ "width":50
+}
