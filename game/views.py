@@ -31,8 +31,6 @@ def home(request):
     return render(request, 'home.html', locals())
 
 def create_account(request):
-    day_counter = Setting.objects.get_current_day()
-    player_count = Account.objects.count()
     if request.method == 'POST':
         form = CreateAccountForm(request.POST)
         if form.is_valid():

@@ -21,8 +21,8 @@ DATABASES = {
     'default': {
         #'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'turnbased.sqlite',
-        'TEST_NAME': 'turnbased_test',
+        'NAME': 'ludumdare27.sqlite',
+        'TEST_NAME': 'ludumdare27_test.sqlite',
         #'USER': 'dcolgan',
         'USER': '',
         'PASSWORD': '',
