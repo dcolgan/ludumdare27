@@ -6,6 +6,9 @@ GAME = {
   create_accout: function() {},
   game: function() {
     var gameViewModel;
+    setTimeout((function() {
+      return location.reload();
+    }), 1000 * 10);
     gameViewModel = function() {
       var typingTimer, vm;
       vm = this;

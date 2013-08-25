@@ -4,7 +4,7 @@ GAME =
     create_accout: ->
 
     game: ->
-        #setTimeout (-> location.reload()), 1000*10
+        setTimeout (-> location.reload()), 1000*10
 
         gameViewModel = ->
             vm = @
