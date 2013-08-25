@@ -16,7 +16,7 @@ MANAGERS = ADMINS
 HOSTNAME = socket.gethostname()
 FILEPATH = os.path.abspath(__file__)
 
-VERSION = 0.7
+VERSION = 0.8
 TURNS_TILL_DEACTIVATION = 4
 
 DEBUG = True
