@@ -56,6 +56,8 @@ class Command(BaseCommand):
                     # Figure stamina for this action
                     this_action = get_action_by_name(this_action_name)
                     account.stamina += this_action['stamina']
+                    if account.stamina > 10:
+                        account.stamina = 10
 
                     if this_action_name == 'walk':
                         if account.direction == 'west':

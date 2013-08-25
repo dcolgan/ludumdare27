@@ -70,7 +70,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
 ACTIONS = [
     { 'which': 'rest', 'name': 'Rest', 'seconds': 1, 'stamina': 1, 'icon': 'glyphicon-pause' },
     { 'which': 'walk', 'name': 'Walk', 'seconds': 2, 'stamina': 0, 'icon': 'glyphicon-step-forward' },
-    { 'which': 'run', 'name': 'Run', 'seconds': 1, 'stamina': -1, 'icon': 'glyphicon-fast-forward' },
+    { 'which': 'run', 'name': 'Run', 'seconds': 1, 'stamina': -2, 'icon': 'glyphicon-fast-forward' },
     { 'which': 'north', 'name': 'Face North', 'seconds': 1, 'stamina': 0, 'icon': 'glyphicon-chevron-up' },
     { 'which': 'south', 'name': 'Face South', 'seconds': 1, 'stamina': 0, 'icon': 'glyphicon-chevron-down' },
     { 'which': 'east', 'name': 'Face East', 'seconds': 1, 'stamina': 0, 'icon': 'glyphicon-chevron-right' },

@@ -7,6 +7,13 @@
 .navbar {
     margin-bottom: 4px !important;
 }
+{% if rows.0.count < 21 %}
+    {% if rows.0.0.col < 25 %}
+        .board-row {
+            float: right;
+        }
+    {% endif %}
+{% endif %}
 </style>
 {% endblock %}
 
@@ -80,7 +87,6 @@
                     {% endfor %}
                 </div>
             {% endfor %}
-            <hr />
             <input class="form-control chat-entry" placeholder="Type chat messages here to be said during the next 10 seconds" type="text" data-bind="value: $root.currentChatMessage, valueUpdate: 'keyup'" maxlength="75" />
             </div>
 

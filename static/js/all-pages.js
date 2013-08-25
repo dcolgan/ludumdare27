@@ -35,6 +35,9 @@ GAME = {
           if (total > 10) {
             total = 10;
           }
+          if (total < 0) {
+            total = 0;
+          }
           return total;
         } else {
           return 0;

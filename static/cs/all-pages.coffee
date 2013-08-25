@@ -4,6 +4,7 @@ GAME =
     create_accout: ->
 
     game: ->
+        #setTimeout (-> location.reload()), 1000*10
 
         gameViewModel = ->
             vm = @
@@ -27,6 +28,7 @@ GAME =
                     for action in vm.chosenActions()
                         total += action.stamina
                     if total > 10 then total = 10
+                    if total < 0 then total = 0
                     return total
                 else
                     return 0
