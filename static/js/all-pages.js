@@ -6,9 +6,6 @@ GAME = {
   create_accout: function() {},
   game: function() {
     var gameViewModel;
-    setTimeout((function() {
-      return location.reload();
-    }), 1000 * 10);
     gameViewModel = function() {
       var typingTimer, vm;
       vm = this;
@@ -16,16 +13,6 @@ GAME = {
       vm.account = ko.observable();
       vm.otherPlayers = ko.observableArray();
       vm.chosenActions = ko.observableArray([]);
-      vm.secondsRemaining = ko.computed(function() {
-        var action, total, _i, _len, _ref;
-        total = 10;
-        _ref = vm.chosenActions();
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          action = _ref[_i];
-          total -= action.seconds;
-        }
-        return total;
-      });
       vm.staminaRemaining = ko.computed(function() {
         var action, total, _i, _len, _ref;
         if (vm.account()) {
@@ -61,7 +48,16 @@ GAME = {
           });
         }
       };
-      vm.currentChatMessage = ko.observable('');
+      vm.secondsRemaining = ko.computed(function() {
+        var action, total, _i, _len, _ref;
+        total = 10;
+        _ref = vm.chosenActions();
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          action = _ref[_i];
+          total -= action.seconds;
+        }
+        return total;
+      });
       vm.cancelAction = function(data, event) {
         var movePosition;
         movePosition = vm.chosenActions.indexOf(data);
@@ -76,18 +72,34 @@ GAME = {
         });
       };
       vm.currentTime = ko.observable(new Date());
+      vm.startTime = ko.observable(new Date());
+      vm.serverSecondsRemaining = ko.observable(30);
+      vm.clockSeconds = ko.computed(function() {
+        return vm.serverSecondsRemaining() - Math.floor((vm.currentTime() - vm.startTime()) / 1000);
+      });
       vm.clockDisplay = ko.computed(function() {
         var seconds;
-        seconds = vm.currentTime().getSeconds();
-        seconds = 60 - seconds;
+        seconds = vm.clockSeconds();
+        if (seconds < 0) {
+          return 'Resolving board, stand by.';
+        }
         if (seconds < 10) {
           seconds = '0' + (seconds + '');
         }
-        return '0:' + seconds;
+        return 'Next 10 seconds happen in: 0:' + seconds;
       });
-      vm.clockSeconds = ko.computed(function() {
-        return vm.currentTime().getSeconds();
-      });
+      setInterval((function() {
+        vm.currentTime(new Date());
+        if (vm.clockSeconds() < -3) {
+          return window.location.href += '';
+        } else {
+          return $('title').text(vm.clockDisplay());
+        }
+      }), 300);
+      vm.currentChatMessage = ko.observable('');
+      vm.getActionButtonContent = function(icon) {
+        return '<span class="glyphicon ' + icon + '"></span> ';
+      };
       vm.doneTypingChat = function() {
         return $.ajax({
           url: '/api/update-chat/',
@@ -97,13 +109,6 @@ GAME = {
             'message': vm.currentChatMessage()
           }
         });
-      };
-      setInterval((function() {
-        vm.currentTime(new Date());
-        return $('title').text('Next in: ' + vm.clockDisplay());
-      }), 300);
-      vm.getActionButtonContent = function(icon) {
-        return '<span class="glyphicon ' + icon + '"></span> ';
       };
       vm.addPlayerMovementArrows = function() {
         var action, curCol, curDir, curRow, prevDir, _i, _len, _ref, _results;
@@ -311,6 +316,10 @@ GAME = {
             otherPlayer = _ref1[_j];
             vm.otherPlayers.push(otherPlayer);
           }
+          vm.serverSecondsRemaining(data.seconds_remaining);
+          console.log('loading again');
+          console.log(data.seconds_remaining);
+          vm.startTime(new Date());
           if (data.actions !== '') {
             actionNames = data.user_actions.split(',');
             for (_k = 0, _len2 = actionNames.length; _k < _len2; _k++) {

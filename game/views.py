@@ -202,6 +202,7 @@ def api_initial_load(request):
     )
 
     return Response({
+        'seconds_remaining': 30 - datetime.datetime.now().second % 30,
         'action_data': ACTIONS,
         'user_actions': request.user.actions,
         'account': AccountSerializer(request.user).data,

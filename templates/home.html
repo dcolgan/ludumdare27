@@ -8,10 +8,20 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col-lg-6 col-lg-offset-3">
+        <div class="col-lg-8 col-lg-offset-2">
             <div class="well">
-                <h1>Ludum Dare 27: The Game</h1>
-                <h2>A Massively Multiplayer<br/>Online Something or other</h2>
+                <img class="pull-right img-thumbnail" src="{{ STATIC_URL }}images/level.png" alt="" />
+                <h1>Capture the Massively Multiplayer Online Flag</h1>
+                <h2>A Real Time Turn Based game that happens in increments of 10 seconds.</h2>
+
+                <div style="width: 420px;">
+                    <a class="btn btn-primary btn-block btn-lg" href="{% url 'login' %}">Log In</a>
+                    <a class="btn btn-success btn-block btn-lg" href="{% url 'create-account' %}">Create Account</a>
+                </div>
+
+                <h3>David S. Colgan, Ludum Dare 27</h3>
+                <p><a href="https://twitter.com/davidscolgan/">Twitter: @davidscolgan</a></p>
+                <p><a href="http://twitch.tv/dvcolgan/">Twitch.TV: dvcolgan</a></p>
             </div>
         </div>
     </div>

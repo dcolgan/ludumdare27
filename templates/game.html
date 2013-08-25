@@ -21,14 +21,15 @@
 {% block body_class %}game{% endblock %}
 
 {% block game_toolbar %}
-<button type="button" class="btn navbar-btn btn-lg pull-right"><span data-bind="text: secondsRemaining"></span> Seconds To Fill</button>
 <button type="button" class="btn navbar-btn btn-lg pull-right" data-bind="
     css: {
-        'btn-danger': clockSeconds() > 15,
+        'btn-success': clockSeconds() > 15,
         'btn-warning': clockSeconds() > 5 && clockSeconds() <= 15,
-        'btn-success': clockSeconds() <= 5
-    }
-    ">Next 10 seconds happen in: <span class="clock-display" data-bind="text: clockDisplay"></button>
+        'btn-danger': clockSeconds() <= 5 && clockSeconds() >= 0,
+        'btn-primary': clockSeconds() < 0
+    },
+    text: clockDisplay
+    "></button>
 
 {% endblock %}
 
@@ -86,10 +87,11 @@
                     </div>
                 {% endfor %}
             </div>
-            <input class="form-control chat-entry" placeholder="Type chat messages here to be said during the next 10 seconds" type="text" data-bind="value: $root.currentChatMessage, valueUpdate: 'keyup'" maxlength="75" />
+            <input class="form-control chat-entry" placeholder="Type chat messages here to be said during the next 10 seconds" type="text" data-bind="visible: clockSeconds() > 0, value: $root.currentChatMessage, valueUpdate: 'keyup'" maxlength="75" />
 
         </div>
-        <div class="col-md-2 sidebar" style="padding-left: 40px">
+        <div class="col-md-2 sidebar" style="padding-left: 30px">
+            <!-- ko if: clockSeconds() > 0 -->
             <div class="btn-group-vertical" style="width: 100%" data-bind="foreach: actions">
                 <button type="button" class="btn btn-primary btn-action" data-bind="
                     click: $root.chooseAction,
@@ -102,7 +104,7 @@
 
                     "></button>
             </div>
-            <h4 data-bind="visible: $root.chosenActions().length > 0">In the next 10 seconds I will:</h4>
+            <h4><span data-bind="text: secondsRemaining"></span> Seconds To Fill</h4>
 
             <div class="actions-panel btn-group-vertical" data-bind="foreach: chosenActions">
                 <button class="btn btn-block btn-sm btn-success" data-bind="
@@ -112,6 +114,7 @@
                 </button>
             </div>
             <h4>Stamina: <span data-bind="text: $root.staminaRemaining"></span></h4>
+            <!-- /ko -->
         </div>
     </div>
 </div>

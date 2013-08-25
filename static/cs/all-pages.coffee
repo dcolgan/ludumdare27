@@ -4,7 +4,6 @@ GAME =
     create_accout: ->
 
     game: ->
-        setTimeout (-> location.reload()), 1000*10
 
         gameViewModel = ->
             vm = @
@@ -15,12 +14,6 @@ GAME =
             vm.otherPlayers = ko.observableArray()
 
             vm.chosenActions = ko.observableArray([])
-
-            vm.secondsRemaining = ko.computed ->
-                total = 10
-                for action in vm.chosenActions()
-                    total -= action.seconds
-                return total
 
             vm.staminaRemaining = ko.computed ->
                 if vm.account()
@@ -47,8 +40,13 @@ GAME =
                             vm.addPlayerMovementArrows()
                     })
 
-            vm.currentChatMessage = ko.observable('')
 
+            # Action seconds for game time
+            vm.secondsRemaining = ko.computed ->
+                total = 10
+                for action in vm.chosenActions()
+                    total -= action.seconds
+                return total
 
             vm.cancelAction = (data, event) ->
                 movePosition = vm.chosenActions.indexOf(data)
@@ -61,43 +59,49 @@ GAME =
                         vm.addPlayerMovementArrows()
                 })
 
+
+
+
+
+
+
+            # Updated every second
             vm.currentTime = ko.observable(new Date())
-            vm.clockDisplay = ko.computed ->
-                # Get the time until the next 2 minute interval
-                #seconds = ((vm.currentTime().getMinutes() % 2) * 60) + vm.currentTime().getSeconds()
+            # When the page loads
+            vm.startTime = ko.observable(new Date())
+            vm.serverSecondsRemaining = ko.observable(30)
 
-                #remaining = 120 - seconds
-                #
-                #if remaining == 120
-                #    return '2:00'
-                #else
-                #    minDisplay = Math.floor(remaining/60)
-                #    secDisplay = remaining % 60
-                #    if secDisplay < 10
-                #        secDisplay = '0' + (secDisplay+'')
-                #    return minDisplay + ':' + secDisplay
-
-                seconds = vm.currentTime().getSeconds()
-                seconds = 60 - seconds
-                if seconds < 10
-                    seconds = '0' + (seconds+'')
-                return '0:' + seconds
 
             vm.clockSeconds = ko.computed ->
-                # Get the time until the next 2 minute interval
-                #seconds = ((vm.currentTime().getMinutes() % 2) * 60) + vm.currentTime().getSeconds()
+                return vm.serverSecondsRemaining() - Math.floor((vm.currentTime() - vm.startTime())/1000)
 
-                #remaining = 120 - seconds
-                #
-                #if remaining == 120
-                #    return '2:00'
-                #else
-                #    minDisplay = Math.floor(remaining/60)
-                #    secDisplay = remaining % 60
-                #    if secDisplay < 10
-                #        secDisplay = '0' + (secDisplay+'')
-                #    return minDisplay + ':' + secDisplay
-                return vm.currentTime().getSeconds()
+            vm.clockDisplay = ko.computed ->
+                seconds = vm.clockSeconds()
+                if seconds < 0
+                    return 'Resolving board, stand by.'
+
+                if seconds < 10
+                    seconds = '0' + (seconds+'')
+
+                return 'Next 10 seconds happen in: 0:' + seconds
+
+            setInterval((->
+                vm.currentTime(new Date())
+                if vm.clockSeconds() < -3
+                    window.location.href += ''
+                else
+                    $('title').text(vm.clockDisplay())
+            ), 300)
+            
+
+
+
+
+
+            vm.currentChatMessage = ko.observable('')
+
+            vm.getActionButtonContent = (icon) ->
+                return '<span class="glyphicon ' + icon + '"></span> '
 
 
             vm.doneTypingChat = ->
@@ -108,13 +112,6 @@ GAME =
                     data: { 'message': vm.currentChatMessage() }
                 })
 
-            setInterval((->
-                vm.currentTime(new Date())
-                $('title').text('Next in: ' + vm.clockDisplay())
-            ), 300)
-            
-            vm.getActionButtonContent = (icon) ->
-                return '<span class="glyphicon ' + icon + '"></span> '
 
             vm.addPlayerMovementArrows = ->
                 $('.arrow').removeClass().addClass('arrow')
@@ -268,6 +265,11 @@ GAME =
                     vm.account(data.account)
                     for otherPlayer in data.other_players
                         vm.otherPlayers.push(otherPlayer)
+
+                    vm.serverSecondsRemaining(data.seconds_remaining)
+                    console.log 'loading again'
+                    console.log data.seconds_remaining
+                    vm.startTime(new Date())
 
                     if data.actions != ''
                         actionNames = data.user_actions.split(',')
