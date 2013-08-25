@@ -34,15 +34,80 @@ GAME = {
         }
       });
       vm.chooseAction = function(data, event) {
-        var thisAction;
+        var nextCol, nextRow, nextTerrainType, thisAction;
         thisAction = data;
+        if (thisAction.which === 'walk') {
+          if (vm.lastActionDir() === 'north') {
+            nextRow = vm.lastActionRow() - 1;
+            nextCol = vm.lastActionCol();
+          }
+          if (vm.lastActionDir() === 'south') {
+            nextRow = vm.lastActionRow() + 1;
+            nextCol = vm.lastActionCol();
+          }
+          if (vm.lastActionDir() === 'east') {
+            nextRow = vm.lastActionRow();
+            nextCol = vm.lastActionCol() + 1;
+          }
+          if (vm.lastActionDir() === 'west') {
+            nextRow = vm.lastActionRow();
+            nextCol = vm.lastActionCol() - 1;
+          }
+          nextTerrainType = $('[data-col="' + nextCol + '"][data-row="' + nextRow + '"]').data('terrain');
+          if (nextTerrainType === 'trees' || nextTerrainType === 'rocks' || nextTerrainType === 'building' || nextTerrainType === 'shrubbery') {
+            alert("You can't walk through " + nextTerrainType + '.');
+            return;
+          }
+        }
+        if (thisAction.which === 'run') {
+          if (vm.lastActionDir() === 'north') {
+            nextRow = vm.lastActionRow() - 1;
+            nextCol = vm.lastActionCol();
+          }
+          if (vm.lastActionDir() === 'south') {
+            nextRow = vm.lastActionRow() + 1;
+            nextCol = vm.lastActionCol();
+          }
+          if (vm.lastActionDir() === 'east') {
+            nextRow = vm.lastActionRow();
+            nextCol = vm.lastActionCol() + 1;
+          }
+          if (vm.lastActionDir() === 'west') {
+            nextRow = vm.lastActionRow();
+            nextCol = vm.lastActionCol() - 1;
+          }
+          nextTerrainType = $('[data-col="' + nextCol + '"][data-row="' + nextRow + '"]').data('terrain');
+          if (nextTerrainType === 'trees' || nextTerrainType === 'rocks' || nextTerrainType === 'building' || nextTerrainType === 'shrubbery' || nextTerrainType === 'water' || nextTerrainType === 'corn') {
+            alert("You can't run through " + nextTerrainType + '.');
+            return;
+          }
+          if (vm.lastActionDir() === 'north') {
+            nextRow = nextRow - 1;
+          }
+          if (vm.lastActionDir() === 'south') {
+            nextRow = nextRow + 1;
+          }
+          if (vm.lastActionDir() === 'east') {
+            nextCol = nextCol + 1;
+          }
+          if (vm.lastActionDir() === 'west') {
+            nextCol = nextCol - 1;
+          }
+          nextTerrainType = $('[data-col="' + nextCol + '"][data-row="' + nextRow + '"]').data('terrain');
+          if (nextTerrainType === 'trees' || nextTerrainType === 'rocks' || nextTerrainType === 'building' || nextTerrainType === 'shrubbery' || nextTerrainType === 'water' || nextTerrainType === 'corn') {
+            alert("You can't run through " + nextTerrainType + '.');
+            return;
+          }
+        }
         if (vm.secondsRemaining() - thisAction.seconds >= 0 && vm.staminaRemaining() + thisAction.stamina >= 0) {
           return $.ajax({
             url: '/api/action/' + data.which + '/',
             method: 'POST',
             dataType: 'json',
             success: function(response) {
-              vm.chosenActions.push(_.cloneDeep(thisAction));
+              var thisChosenAction;
+              thisChosenAction = _.cloneDeep(thisAction);
+              vm.chosenActions.push(thisChosenAction);
               return vm.addPlayerMovementArrows();
             }
           });
@@ -102,6 +167,9 @@ GAME = {
       vm.getActionButtonContent = function(icon) {
         return '<span class="glyphicon ' + icon + '"></span> ';
       };
+      vm.lastActionCol = ko.observable(0);
+      vm.lastActionRow = ko.observable(0);
+      vm.lastActionDir = ko.observable('down');
       vm.doneTypingChat = function() {
         return $.ajax({
           url: '/api/update-chat/',
@@ -113,14 +181,13 @@ GAME = {
         });
       };
       vm.addPlayerMovementArrows = function() {
-        var action, curCol, curDir, curRow, prevDir, _i, _len, _ref, _results;
+        var action, curCol, curDir, curRow, prevDir, _i, _len, _ref;
         $('.arrow').removeClass().addClass('arrow');
         curCol = vm.account().col;
         curRow = vm.account().row;
         prevDir = vm.account().direction;
         curDir = vm.account().direction;
         _ref = vm.chosenActions();
-        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           action = _ref[_i];
           if (action.which === 'walk') {
@@ -140,7 +207,7 @@ GAME = {
               curCol -= 1;
               prevDir = 'east';
             }
-            _results.push($('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.arrow').addClass(prevDir + '-' + curDir));
+            $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.arrow').addClass(prevDir + '-' + curDir);
           } else if (action.which === 'run') {
             if (curDir === 'north') {
               curRow -= 1;
@@ -175,7 +242,7 @@ GAME = {
               curCol -= 1;
               prevDir = 'east';
             }
-            _results.push($('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.arrow').addClass(prevDir + '-' + curDir));
+            $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.arrow').addClass(prevDir + '-' + curDir);
           } else if (action.which === 'north' || action.which === 'south' || action.which === 'east' || action.which === 'west') {
             if (curDir === 'north') {
               prevDir = 'south';
@@ -190,12 +257,12 @@ GAME = {
               prevDir = 'east';
             }
             curDir = action.which;
-            _results.push($('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.arrow').addClass(prevDir + '-' + curDir));
-          } else {
-            _results.push(void 0);
+            $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.arrow').addClass(prevDir + '-' + curDir);
           }
         }
-        return _results;
+        vm.lastActionCol(curCol);
+        vm.lastActionRow(curRow);
+        return vm.lastActionDir(curDir);
       };
       vm.addOthersMovementArrows = function() {
         var $square, a, action, actionName, curCol, curDir, curRow, otherPlayer, prevDir, thisPlayersActions, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _results;
@@ -313,6 +380,9 @@ GAME = {
             vm.actions.push(action);
           }
           vm.account(data.account);
+          vm.lastActionCol(data.account.col);
+          vm.lastActionRow(data.account.row);
+          vm.lastActionDir(data.account.direction);
           _ref1 = data.other_players;
           for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
             otherPlayer = _ref1[_j];

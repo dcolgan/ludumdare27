@@ -133,6 +133,10 @@ class Command(BaseCommand):
                     if this_action_name in ['north', 'south', 'east', 'west']:
                         account.direction = this_action_name
 
+                    if account.col < 1: account.col = 1
+                    if account.col > 48: account.col = 48
+                    if account.row < 1: account.row = 1
+                    if account.row > 73: account.row = 73
                     account.save()
 
 

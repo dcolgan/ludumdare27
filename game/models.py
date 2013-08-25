@@ -85,8 +85,8 @@ def get_action_by_name(which):
 
 TILES = [
     None,
-    'grass', 'water', 'corn', 'impassable', 'impassable', None, None, None, None, None,
-    'grass', 'impassable', 'grass', 'grass', None, None, None, None, None, None,
+    'grass', 'water', 'corn', 'rocks', 'trees', None, None, None, None, None,
+    'grass', 'shrubbery', 'grass', 'grass', None, None, None, None, None, None,
     'road', 'road', 'red-flag', 'blue-flag', None, None, None, None, None, None,
     'road', 'road', 'water', 'water', None, None, None, None, None, None,
     'road', 'road', 'water', 'water', None, None, None, None, None, None,
@@ -140,6 +140,8 @@ class Square(models.Model):
     def get_css_offset_y(self):
         return str(32 * (self.tile-1) / 320 * 32 * -1) + 'px'
 
+    def get_terrain_type(self):
+        return TILES[self.tile]
 
 class Log(models.Model):
     TEAMS = (

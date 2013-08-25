@@ -70,7 +70,8 @@
                                 data-bind="
                                 attr: {
                                     'data-col': {{ square.col }},
-                                    'data-row': {{ square.row }}
+                                    'data-row': {{ square.row }},
+                                    'data-terrain': '{{ square.get_terrain_type }}'
                                 }
                                 ">
                                 {% if square.col == request.user.col and square.row == request.user.row %}

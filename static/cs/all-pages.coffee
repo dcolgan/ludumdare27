@@ -29,6 +29,65 @@ GAME =
 
             vm.chooseAction = (data, event) ->
                 thisAction = data
+                if thisAction.which == 'walk'
+                    if vm.lastActionDir() == 'north'
+                        nextRow = vm.lastActionRow()-1
+                        nextCol = vm.lastActionCol()
+                    if vm.lastActionDir() == 'south'
+                        nextRow = vm.lastActionRow()+1
+                        nextCol = vm.lastActionCol()
+                    if vm.lastActionDir() == 'east'
+                        nextRow = vm.lastActionRow()
+                        nextCol = vm.lastActionCol()+1
+                    if vm.lastActionDir() == 'west'
+                        nextRow = vm.lastActionRow()
+                        nextCol = vm.lastActionCol()-1
+
+                    nextTerrainType = $('[data-col="' + nextCol + '"][data-row="' + nextRow + '"]').data('terrain')
+
+                    # Can't pass any of these
+                    if nextTerrainType == 'trees' or nextTerrainType == 'rocks' or nextTerrainType == 'building' or nextTerrainType == 'shrubbery'
+                        alert("You can't walk through " + nextTerrainType + '.')
+                        return
+
+
+                if thisAction.which == 'run'
+                    if vm.lastActionDir() == 'north'
+                        nextRow = vm.lastActionRow()-1
+                        nextCol = vm.lastActionCol()
+                    if vm.lastActionDir() == 'south'
+                        nextRow = vm.lastActionRow()+1
+                        nextCol = vm.lastActionCol()
+                    if vm.lastActionDir() == 'east'
+                        nextRow = vm.lastActionRow()
+                        nextCol = vm.lastActionCol()+1
+                    if vm.lastActionDir() == 'west'
+                        nextRow = vm.lastActionRow()
+                        nextCol = vm.lastActionCol()-1
+                    nextTerrainType = $('[data-col="' + nextCol + '"][data-row="' + nextRow + '"]').data('terrain')
+
+                    # Can't pass any of these
+                    if nextTerrainType == 'trees' or nextTerrainType == 'rocks' or nextTerrainType == 'building' or nextTerrainType == 'shrubbery' or nextTerrainType == 'water' or nextTerrainType == 'corn'
+                        alert("You can't run through " + nextTerrainType + '.')
+                        return
+
+
+                    if vm.lastActionDir() == 'north'
+                        nextRow = nextRow-1
+                    if vm.lastActionDir() == 'south'
+                        nextRow = nextRow+1
+                    if vm.lastActionDir() == 'east'
+                        nextCol = nextCol+1
+                    if vm.lastActionDir() == 'west'
+                        nextCol = nextCol-1
+                    nextTerrainType = $('[data-col="' + nextCol + '"][data-row="' + nextRow + '"]').data('terrain')
+
+                    # Can't pass any of these
+                    if nextTerrainType == 'trees' or nextTerrainType == 'rocks' or nextTerrainType == 'building' or nextTerrainType == 'shrubbery' or nextTerrainType == 'water' or nextTerrainType == 'corn'
+                        alert("You can't run through " + nextTerrainType + '.')
+                        return
+
+
                 if vm.secondsRemaining() - thisAction.seconds >= 0 and vm.staminaRemaining() + thisAction.stamina >= 0
                     
                     $.ajax({
@@ -36,7 +95,10 @@ GAME =
                         method: 'POST'
                         dataType: 'json'
                         success: (response) ->
-                            vm.chosenActions.push(_.cloneDeep(thisAction))
+                            thisChosenAction = _.cloneDeep(thisAction)
+
+                            #thisChosenAction.
+                            vm.chosenActions.push(thisChosenAction)
                             vm.addPlayerMovementArrows()
                     })
 
@@ -97,13 +159,15 @@ GAME =
             
 
 
-
-
-
             vm.currentChatMessage = ko.observable('')
 
             vm.getActionButtonContent = (icon) ->
                 return '<span class="glyphicon ' + icon + '"></span> '
+
+
+            vm.lastActionCol = ko.observable(0)
+            vm.lastActionRow = ko.observable(0)
+            vm.lastActionDir = ko.observable('down')
 
 
             vm.doneTypingChat = ->
@@ -174,6 +238,9 @@ GAME =
                             prevDir = 'east'
                         curDir = action.which
                         $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.arrow').addClass(prevDir + '-' + curDir)
+                vm.lastActionCol(curCol)
+                vm.lastActionRow(curRow)
+                vm.lastActionDir(curDir)
 
             vm.addOthersMovementArrows = ->
                 $('.other-arrow').removeClass().addClass('other-arrow')
@@ -265,6 +332,10 @@ GAME =
                         vm.actions.push(action)
 
                     vm.account(data.account)
+                    vm.lastActionCol(data.account.col)
+                    vm.lastActionRow(data.account.row)
+                    vm.lastActionDir(data.account.direction)
+
                     for otherPlayer in data.other_players
                         vm.otherPlayers.push(otherPlayer)
 
