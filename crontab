@@ -1,0 +1,2 @@
+* * * * * cd /home/ludumdare27/ludumdare27/ && /home/ludumdare27/ludumdare27/env/bin/python /home/ludumdare27/ludumdare27/manage.py resolve
+* * * * * sleep 30; cd /home/ludumdare27/ludumdare27/ && /home/ludumdare27/ludumdare27/env/bin/python /home/ludumdare27/ludumdare27/manage.py resolve

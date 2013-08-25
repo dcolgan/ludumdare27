@@ -47,18 +47,24 @@ GAME =
             vm.currentTime = ko.observable(new Date())
             vm.clockDisplay = ko.computed ->
                 # Get the time until the next 2 minute interval
-                seconds = ((vm.currentTime().getMinutes() % 2) * 60) + vm.currentTime().getSeconds()
+                #seconds = ((vm.currentTime().getMinutes() % 2) * 60) + vm.currentTime().getSeconds()
 
-                remaining = 120 - seconds
-                
-                if remaining == 120
-                    return '2:00'
-                else
-                    minDisplay = Math.floor(remaining/60)
-                    secDisplay = remaining % 60
-                    if secDisplay < 10
-                        secDisplay = '0' + (secDisplay+'')
-                    return minDisplay + ':' + secDisplay
+                #remaining = 120 - seconds
+                #
+                #if remaining == 120
+                #    return '2:00'
+                #else
+                #    minDisplay = Math.floor(remaining/60)
+                #    secDisplay = remaining % 60
+                #    if secDisplay < 10
+                #        secDisplay = '0' + (secDisplay+'')
+                #    return minDisplay + ':' + secDisplay
+
+                seconds = vm.currentTime().getSeconds() % 30
+                seconds = 30 - seconds
+                if seconds < 10
+                    seconds = '0' + (seconds+'')
+                return '0:' + seconds
 
             setInterval((->
                 vm.currentTime(new Date())
@@ -75,7 +81,7 @@ GAME =
                 prevDir = vm.account().direction
                 curDir = vm.account().direction
                 for action in vm.chosenActions()
-                    if action.which == 'walk' or action.which == 'run'
+                    if action.which == 'walk'
                         if curDir == 'north'
                             curRow -= 1
                             prevDir = 'south'
@@ -88,6 +94,34 @@ GAME =
                         if curDir == 'west'
                             curCol -= 1
                             prevDir = 'east'
+                        $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.arrow').addClass(prevDir + '-' + curDir)
+                    else if action.which == 'run'
+                        if curDir == 'north'
+                            curRow -= 1
+                            prevDir = 'south'
+                        if curDir == 'south'
+                            curRow += 1
+                            prevDir = 'north'
+                        if curDir == 'east'
+                            curCol += 1
+                            prevDir = 'west'
+                        if curDir == 'west'
+                            curCol -= 1
+                            prevDir = 'east'
+                        $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.arrow').addClass(prevDir + '-' + curDir)
+                        if curDir == 'north'
+                            curRow -= 1
+                            prevDir = 'south'
+                        if curDir == 'south'
+                            curRow += 1
+                            prevDir = 'north'
+                        if curDir == 'east'
+                            curCol += 1
+                            prevDir = 'west'
+                        if curDir == 'west'
+                            curCol -= 1
+                            prevDir = 'east'
+                        $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.arrow').addClass(prevDir + '-' + curDir)
                     else if action.which == 'north' or action.which == 'south' or action.which == 'east' or action.which == 'west'
                         if curDir == 'north'
                             prevDir = 'south'
@@ -98,9 +132,7 @@ GAME =
                         if curDir == 'west'
                             prevDir = 'east'
                         curDir = action.which
-                        
-                    console.log(prevDir + '-' + curDir)
-                    $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.arrow').addClass(prevDir + '-' + curDir)
+                        $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.arrow').addClass(prevDir + '-' + curDir)
 
             vm.addOthersMovementArrows = ->
                 $('.other-arrow').removeClass().addClass('other-arrow')
@@ -122,7 +154,7 @@ GAME =
                                     action = a
                                     break
 
-                            if action.which == 'walk' or action.which == 'run'
+                            if action.which == 'walk'
                                 if curDir == 'north'
                                     curRow -= 1
                                     prevDir = 'south'
@@ -135,6 +167,34 @@ GAME =
                                 if curDir == 'west'
                                     curCol -= 1
                                     prevDir = 'east'
+                                $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-arrow').addClass(prevDir + '-' + curDir)
+                            else if action.which == 'run'
+                                if curDir == 'north'
+                                    curRow -= 1
+                                    prevDir = 'south'
+                                if curDir == 'south'
+                                    curRow += 1
+                                    prevDir = 'north'
+                                if curDir == 'east'
+                                    curCol += 1
+                                    prevDir = 'west'
+                                if curDir == 'west'
+                                    curCol -= 1
+                                    prevDir = 'east'
+                                $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-arrow').addClass(prevDir + '-' + curDir)
+                                if curDir == 'north'
+                                    curRow -= 1
+                                    prevDir = 'south'
+                                if curDir == 'south'
+                                    curRow += 1
+                                    prevDir = 'north'
+                                if curDir == 'east'
+                                    curCol += 1
+                                    prevDir = 'west'
+                                if curDir == 'west'
+                                    curCol -= 1
+                                    prevDir = 'east'
+                                $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-arrow').addClass(prevDir + '-' + curDir)
                             else if action.which == 'north' or action.which == 'south' or action.which == 'east' or action.which == 'west'
                                 if curDir == 'north'
                                     prevDir = 'south'
@@ -145,9 +205,7 @@ GAME =
                                 if curDir == 'west'
                                     prevDir = 'east'
                                 curDir = action.which
-                                
-                            console.log(prevDir + '-' + curDir)
-                            $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-arrow').addClass(prevDir + '-' + curDir)
+                                $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-arrow').addClass(prevDir + '-' + curDir)
 
                     # Add the other player graphic
                     $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-player').addClass(otherPlayer.team).addClass(otherPlayer.direction)

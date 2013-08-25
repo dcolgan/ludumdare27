@@ -46,19 +46,13 @@ GAME = {
       };
       vm.currentTime = ko.observable(new Date());
       vm.clockDisplay = ko.computed(function() {
-        var minDisplay, remaining, secDisplay, seconds;
-        seconds = ((vm.currentTime().getMinutes() % 2) * 60) + vm.currentTime().getSeconds();
-        remaining = 120 - seconds;
-        if (remaining === 120) {
-          return '2:00';
-        } else {
-          minDisplay = Math.floor(remaining / 60);
-          secDisplay = remaining % 60;
-          if (secDisplay < 10) {
-            secDisplay = '0' + (secDisplay + '');
-          }
-          return minDisplay + ':' + secDisplay;
+        var seconds;
+        seconds = vm.currentTime().getSeconds() % 30;
+        seconds = 30 - seconds;
+        if (seconds < 10) {
+          seconds = '0' + (seconds + '');
         }
+        return '0:' + seconds;
       });
       setInterval((function() {
         vm.currentTime(new Date());
@@ -78,7 +72,7 @@ GAME = {
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           action = _ref[_i];
-          if (action.which === 'walk' || action.which === 'run') {
+          if (action.which === 'walk') {
             if (curDir === 'north') {
               curRow -= 1;
               prevDir = 'south';
@@ -95,6 +89,42 @@ GAME = {
               curCol -= 1;
               prevDir = 'east';
             }
+            _results.push($('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.arrow').addClass(prevDir + '-' + curDir));
+          } else if (action.which === 'run') {
+            if (curDir === 'north') {
+              curRow -= 1;
+              prevDir = 'south';
+            }
+            if (curDir === 'south') {
+              curRow += 1;
+              prevDir = 'north';
+            }
+            if (curDir === 'east') {
+              curCol += 1;
+              prevDir = 'west';
+            }
+            if (curDir === 'west') {
+              curCol -= 1;
+              prevDir = 'east';
+            }
+            $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.arrow').addClass(prevDir + '-' + curDir);
+            if (curDir === 'north') {
+              curRow -= 1;
+              prevDir = 'south';
+            }
+            if (curDir === 'south') {
+              curRow += 1;
+              prevDir = 'north';
+            }
+            if (curDir === 'east') {
+              curCol += 1;
+              prevDir = 'west';
+            }
+            if (curDir === 'west') {
+              curCol -= 1;
+              prevDir = 'east';
+            }
+            _results.push($('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.arrow').addClass(prevDir + '-' + curDir));
           } else if (action.which === 'north' || action.which === 'south' || action.which === 'east' || action.which === 'west') {
             if (curDir === 'north') {
               prevDir = 'south';
@@ -109,9 +139,10 @@ GAME = {
               prevDir = 'east';
             }
             curDir = action.which;
+            _results.push($('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.arrow').addClass(prevDir + '-' + curDir));
+          } else {
+            _results.push(void 0);
           }
-          console.log(prevDir + '-' + curDir);
-          _results.push($('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.arrow').addClass(prevDir + '-' + curDir));
         }
         return _results;
       };
@@ -139,7 +170,7 @@ GAME = {
                   break;
                 }
               }
-              if (action.which === 'walk' || action.which === 'run') {
+              if (action.which === 'walk') {
                 if (curDir === 'north') {
                   curRow -= 1;
                   prevDir = 'south';
@@ -156,6 +187,42 @@ GAME = {
                   curCol -= 1;
                   prevDir = 'east';
                 }
+                $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-arrow').addClass(prevDir + '-' + curDir);
+              } else if (action.which === 'run') {
+                if (curDir === 'north') {
+                  curRow -= 1;
+                  prevDir = 'south';
+                }
+                if (curDir === 'south') {
+                  curRow += 1;
+                  prevDir = 'north';
+                }
+                if (curDir === 'east') {
+                  curCol += 1;
+                  prevDir = 'west';
+                }
+                if (curDir === 'west') {
+                  curCol -= 1;
+                  prevDir = 'east';
+                }
+                $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-arrow').addClass(prevDir + '-' + curDir);
+                if (curDir === 'north') {
+                  curRow -= 1;
+                  prevDir = 'south';
+                }
+                if (curDir === 'south') {
+                  curRow += 1;
+                  prevDir = 'north';
+                }
+                if (curDir === 'east') {
+                  curCol += 1;
+                  prevDir = 'west';
+                }
+                if (curDir === 'west') {
+                  curCol -= 1;
+                  prevDir = 'east';
+                }
+                $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-arrow').addClass(prevDir + '-' + curDir);
               } else if (action.which === 'north' || action.which === 'south' || action.which === 'east' || action.which === 'west') {
                 if (curDir === 'north') {
                   prevDir = 'south';
@@ -170,9 +237,8 @@ GAME = {
                   prevDir = 'east';
                 }
                 curDir = action.which;
+                $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-arrow').addClass(prevDir + '-' + curDir);
               }
-              console.log(prevDir + '-' + curDir);
-              $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-arrow').addClass(prevDir + '-' + curDir);
             }
           }
           _results.push($('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-player').addClass(otherPlayer.team).addClass(otherPlayer.direction));
