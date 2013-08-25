@@ -149,8 +149,8 @@ GAME =
                             console.log(prevDir + '-' + curDir)
                             $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-arrow').addClass(prevDir + '-' + curDir)
 
-                # Add the other player graphic
-                $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-player').addClass(otherPlayer.team).addClass(otherPlayer.direction)
+                    # Add the other player graphic
+                    $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-player').addClass(otherPlayer.team).addClass(otherPlayer.direction)
 
 
             $.ajax({

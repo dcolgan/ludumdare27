@@ -116,9 +116,10 @@ GAME = {
         return _results;
       };
       vm.addOthersMovementArrows = function() {
-        var a, action, actionName, curCol, curDir, curRow, otherPlayer, prevDir, thisPlayersActions, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
+        var a, action, actionName, curCol, curDir, curRow, otherPlayer, prevDir, thisPlayersActions, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _results;
         $('.other-arrow').removeClass().addClass('other-arrow');
         _ref = vm.otherPlayers();
+        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           otherPlayer = _ref[_i];
           curCol = otherPlayer.last_col;
@@ -174,8 +175,9 @@ GAME = {
               $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-arrow').addClass(prevDir + '-' + curDir);
             }
           }
+          _results.push($('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-player').addClass(otherPlayer.team).addClass(otherPlayer.direction));
         }
-        return $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-player').addClass(otherPlayer.team).addClass(otherPlayer.direction);
+        return _results;
       };
       $.ajax({
         url: '/api/initial-load/',
