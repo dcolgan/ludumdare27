@@ -85,10 +85,12 @@ GAME =
 
                 return 'Next 10 seconds happen in: 0:' + seconds
 
-            setInterval((->
+            tickLoop = null
+            tickLoop = setInterval((->
                 vm.currentTime(new Date())
                 if vm.clockSeconds() < -3
                     window.location.href += ''
+                    clearInterval(tickLoop)
                 else
                     $('title').text(vm.clockDisplay())
             ), 300)

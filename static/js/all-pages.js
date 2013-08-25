@@ -7,7 +7,7 @@ GAME = {
   game: function() {
     var gameViewModel;
     gameViewModel = function() {
-      var typingTimer, vm;
+      var tickLoop, typingTimer, vm;
       vm = this;
       vm.actions = ko.observableArray([]);
       vm.account = ko.observable();
@@ -88,10 +88,12 @@ GAME = {
         }
         return 'Next 10 seconds happen in: 0:' + seconds;
       });
-      setInterval((function() {
+      tickLoop = null;
+      tickLoop = setInterval((function() {
         vm.currentTime(new Date());
         if (vm.clockSeconds() < -3) {
-          return window.location.href += '';
+          window.location.href += '';
+          return clearInterval(tickLoop);
         } else {
           return $('title').text(vm.clockDisplay());
         }
