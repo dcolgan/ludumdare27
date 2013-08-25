@@ -16,6 +16,8 @@ MANAGERS = ADMINS
 HOSTNAME = socket.gethostname()
 FILEPATH = os.path.abspath(__file__)
 
+VERSION = 0.7
+
 DEBUG = True
 DATABASES = {
     'default': {

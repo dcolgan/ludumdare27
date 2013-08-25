@@ -1,3 +1,4 @@
+{% load custom_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,14 +10,35 @@
 
     <link rel="shortcut icon" href="{{ STATIC_URL }}images/favicon.ico">
 
-    <!--<link href='http://fonts.googleapis.com/css?family=Patua+One' rel='stylesheet' type='text/css'>-->
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
 
     {% block head %}{% endblock %}
 
-    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/style.css">
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/style.css?v={% setting "VERSION" %}">
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css">
 </head>
 <body class="{% block body_class %}{% endblock %}">
+
+    <div class="navbar navbar-default">
+        <div class="container-fixed">
+        {% if request.user.is_authenticated %}
+        <a class="navbar-brand" href="{% url 'game' %}">Capture the Massively<br/>Multiplayer Online Flag&nbsp;</a>
+        {% else %}
+        <a class="navbar-brand" href="{% url 'home' %}">Capture the Massively<br/>Multiplayer Online Flag&nbsp;</a>
+        {% endif %}
+        <ul class="nav navbar-nav">
+            <li><a href="{% url 'game' %}">Game</a></li>
+            <li><a href="{% url 'how-to-play' %}">How To Play</a></li>
+            <li><a href="{% url 'leaderboards' %}">Leaderboards</a></li>
+            {% if request.user.is_authenticated %}
+            <li><a href="{% url 'logout' %}">Log Out</a></li>
+            {% else %}
+            <li><a href="{% url 'login' %}">Log In</a></li>
+            {% endif %}
+        </ul>
+        {% block game_toolbar %}{% endblock %}
+        </div>
+    </div>
 
     {% block content %}{% endblock %}
 
@@ -24,8 +46,8 @@
     <script src='{{ STATIC_URL }}/js/jquery.cookie.js'></script>
     <script src='{{ STATIC_URL }}js/lodash.js'></script>
     <script src='{{ STATIC_URL }}bootstrap/js/bootstrap.js'></script>
-    <script src="{{ STATIC_URL }}js/knockout-2.3.0.js"></script>
-    <script src="{{ STATIC_URL }}js/all-pages.js"></script>
+    <script src='{{ STATIC_URL }}js/knockout-2.3.0.js'></script>
+    <script src='{{ STATIC_URL }}js/all-pages.js?v={% setting "VERSION" %}'></script>
     {% block foot %}{% endblock %}
 </body>
 </html>

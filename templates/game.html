@@ -3,6 +3,11 @@
 {% block title %}Play that Game{% endblock %}
 
 {% block head %}
+<style>
+.navbar {
+    margin-bottom: 4px !important;
+}
+</style>
 {% endblock %}
 
 {% block goesinfoot %}
@@ -10,22 +15,41 @@
 
 {% block body_class %}game{% endblock %}
 
+{% block game_toolbar %}
+<button type="button" class="btn navbar-btn btn-lg pull-right"><span data-bind="text: secondsRemaining"></span> Seconds To Fill</button>
+<button type="button" class="btn navbar-btn btn-lg pull-right" data-bind="
+    css: {
+        'btn-danger': clockSeconds() > 15,
+        'btn-warning': clockSeconds() > 5 && clockSeconds() <= 15,
+        'btn-success': clockSeconds() <= 5
+    }
+    ">Next 10 seconds happen in: <span class="clock-display" data-bind="text: clockDisplay"></button>
+
+{% endblock %}
+
 {% block content %}
 
-<div class="container">
+<div class="container-fixed">
     <div class="row">
         <div class="col-md-3 sidebar">
-            <a href="{% url 'game' %}"><img src="{{ STATIC_URL }}images/logo.png" alt="" /></a>
-            <ul>
-                {% if request.user.is_authenticated %}
-                <li><a href="{% url 'logout' %}">Log Out</a></li>
-                {% else %}
-                <li><a href="{% url 'login' %}">Log In</a></li>
-                {% endif %}
-            </ul>
+            <img src="{{ STATIC_URL }}images/level.png" alt="" />
+            <h4>Heard in the last 10 seconds:</h4>
+            <div class="well" style="height: 156px; overflow-y: scroll;">
+                {% for announcement in announcements %}
+                <p><strong>Announcer</strong>: {{ announcement.text }}</p>
+                {% endfor %}
 
-            <h4>Next 10 seconds in:</h4>
-            <div class="clock-display" data-bind="text: clockDisplay"></div>
+
+                <!-- ko foreach: otherPlayers -->
+                    <!-- ko if: last_chat_message != '' -->
+                    <p><strong data-bind="text: username"></strong>: <span data-bind="text: last_chat_message"></span></p>
+                    <!-- /ko -->
+                <!-- /ko -->
+
+                <!-- ko if: $root.account() && $root.account().last_chat_message != '' -->
+                <p><strong data-bind="text: $root.account().username"></strong>: <span data-bind="text: $root.account().last_chat_message"></span></p>
+                <!-- /ko -->
+            </div>
         </div>
         <div class="col-md-7">
             <div class="board-overlay"></div>
@@ -44,47 +68,46 @@
                             }
                             ">
                             {% if square.col == request.user.col and square.row == request.user.row %}
-                                <div class="player {{ request.user.direction }} {{ request.user.team }}">
+                            <div class="player-name">{{ request.user.username }} ({{ request.user.flags_gotten }}f,{{ request.user.enemies_tagged }}t)</div>
+                            <div class="player {{ request.user.direction }} {{ request.user.team }}{% if request.user.has_flag %} flag{% endif %}">
                                 </div>
                             {% endif %}
-                            <div class="other-player">
-                            </div>
-                            <div class="arrow">
-                            </div>
-                            <div class="other-arrow">
-                            </div>
+                            <div class="other-player-name"></div>
+                            <div class="other-player"></div>
+                            <div class="arrow"></div>
+                            <div class="other-arrow"></div>
                         </div>
                     {% endfor %}
                 </div>
             {% endfor %}
+            <hr />
+            <input class="form-control chat-entry" placeholder="Type chat messages here to be said during the next 10 seconds" type="text" data-bind="value: $root.currentChatMessage, valueUpdate: 'keyup'" maxlength="75" />
             </div>
 
         </div>
-        <div class="col-md-2 sidebar">
-            <!-- ko foreach: actions -->
-            <button type="button" class="btn btn-block btn-primary btn-action" data-bind="
-                click: $root.chooseAction,
-                html: $root.getActionButtonContent(icon) + name,
-                attr: {
-                    'data-action': which,
-                    'data-seconds': seconds,
-                    'data-stamina': stamina
-                }
+        <div class="col-md-2 sidebar" style="padding-left: 40px">
+            <div class="btn-group-vertical" style="width: 100%" data-bind="foreach: actions">
+                <button type="button" class="btn btn-primary btn-action" data-bind="
+                    click: $root.chooseAction,
+                    html: $root.getActionButtonContent(icon) + name,
+                    attr: {
+                        'data-action': which,
+                        'data-seconds': seconds,
+                        'data-stamina': stamina
+                    }
 
-                "><span data-bind=""></span></button>
-            <!-- /ko -->
-            <hr />
-            <h4 data-bind="visible: $root.chosenActions().length > 0">Actions for the next 10 seconds:</h4>
+                    "></button>
+            </div>
+            <h4 data-bind="visible: $root.chosenActions().length > 0">In the next 10 seconds I will:</h4>
 
-            <div class="actions-panel" data-bind="foreach: chosenActions">
-                <button class="btn btn-block btn-success" data-bind="
+            <div class="actions-panel btn-group-vertical" data-bind="foreach: chosenActions">
+                <button class="btn btn-block btn-sm btn-success" data-bind="
                     html: $root.getActionButtonContent(icon) + name,
                     click: $root.cancelAction
                     ">
                 </button>
-                 
             </div>
-            <h4><span data-bind="text: secondsRemaining"></span> Seconds Left</h4>
+            <h4>Stamina: <span data-bind="text: $root.staminaRemaining"></span></h4>
         </div>
     </div>
 </div>

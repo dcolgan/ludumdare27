@@ -1,5 +1,21 @@
-body {
-  padding-top: 10px;
+h1,
+h2,
+h3,
+h4,
+h5,
+.navbar-brand {
+  font-family: Ubuntu, sans-serif !important;
+}
+.navbar-brand {
+  padding: 4px !important;
+}
+.navbar-btn {
+  margin-top: 2px !important;
+  margin-bottom: 0 !important;
+}
+.container-fixed {
+  margin: 0 auto;
+  width: 1140px;
 }
 .color-swatch {
   width: 120px;
@@ -23,13 +39,15 @@ body {
 .board-overlay {
   position: absolute;
   z-index: 1000;
-  width: 480px;
-  height: 480px;
+  width: 672px;
+  height: 544px;
   background-image: url(/static/images/ld27-grid.png);
 }
 .board {
-  width: 480px;
-  height: 480px;
+  border: 2px solid #444;
+  width: 676px;
+  height: 548px;
+  border-radius: 2px;
 }
 .board-row {
   clear: both;
@@ -40,13 +58,25 @@ body {
   float: left;
   background-color: green;
 }
-.clock-display {
-  font-size: 32px;
-  padding: 20px;
-  text-align: center;
+.actions-panel {
+  width: 100%;
 }
 .square {
   background-image: url(/static/images/ld27-tileset.png);
+}
+.player-name,
+.other-player-name {
+  position: absolute;
+  margin-left: -20px;
+  margin-top: -20px;
+  color: white;
+  text-shadow: -1px -1px 1px #000000, 1px -1px 1px #000000, -1px 1px 1px #000000, 1px 1px 1px #000000;
+}
+.player-name {
+  z-index: 150;
+}
+.other-player-name {
+  z-index: 140;
 }
 .player,
 .other-player {
@@ -93,6 +123,46 @@ body {
 .other-player.blue.west {
   background-image: url(/static/images/ld27-tileset.png);
   background-position: -160px -128px;
+}
+.player.red.south.flag,
+.other-player.red.south.flag {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -192px -32px;
+}
+.player.red.north.flag,
+.other-player.red.north.flag {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -192px -64px;
+}
+.player.red.east.flag,
+.other-player.red.east.flag {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -192px -96px;
+}
+.player.red.west.flag,
+.other-player.red.west.flag {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -192px -128px;
+}
+.player.blue.south.flag,
+.other-player.blue.south.flag {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -224px -32px;
+}
+.player.blue.north.flag,
+.other-player.blue.north.flag {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -224px -64px;
+}
+.player.blue.east.flag,
+.other-player.blue.east.flag {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -224px -96px;
+}
+.player.blue.west.flag,
+.other-player.blue.west.flag {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -224px -128px;
 }
 .player {
   z-index: 200;

@@ -11,6 +11,10 @@ urlpatterns = patterns('game.views',
 
     url(r'^create-account/$', 'create_account', name='create-account'),
 
+    url(r'^how-to-play/$', 'how_to_play', name='how-to-play'),
+
+    url(r'^leaderboards/$', 'leaderboards', name='leaderboards'),
+
     #url(r'^profile/$', 'profile', name='profile'),
     #url(r'^profile/(?P<account_id>\d+)/$', 'profile', name='profile'),
 
@@ -18,5 +22,6 @@ urlpatterns = patterns('game.views',
     url(r'^api/cancel/(?P<move_position>\d+)/$', 'api_cancel', name='api-cancel'),
 
     url(r'^api/initial-load/$', 'api_initial_load', name='api-initial-load'),
+    url(r'^api/update-chat/$', 'api_update_chat', name='api-update-chat'),
 
 )

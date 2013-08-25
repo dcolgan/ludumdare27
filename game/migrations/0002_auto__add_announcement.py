@@ -8,15 +8,17 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'Account.last_direction'
-        db.add_column(u'game_account', 'last_direction',
-                      self.gf('django.db.models.fields.CharField')(default='down', max_length=10),
-                      keep_default=False)
+        # Adding model 'Announcement'
+        db.create_table(u'game_announcement', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('text', self.gf('django.db.models.fields.CharField')(max_length=75)),
+        ))
+        db.send_create_signal(u'game', ['Announcement'])
 
 
     def backwards(self, orm):
-        # Deleting field 'Account.last_direction'
-        db.delete_column(u'game_account', 'last_direction')
+        # Deleting model 'Announcement'
+        db.delete_table(u'game_announcement')
 
 
     models = {
@@ -43,9 +45,10 @@ class Migration(SchemaMigration):
         u'game.account': {
             'Meta': {'object_name': 'Account'},
             'actions': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
+            'chat_message': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '75', 'blank': 'True'}),
             'col': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'direction': ('django.db.models.fields.CharField', [], {'default': "'down'", 'max_length': '10'}),
+            'direction': ('django.db.models.fields.CharField', [], {'default': "'south'", 'max_length': '10', 'blank': 'True'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'enemies_tagged': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'flags_gotten': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
@@ -56,16 +59,30 @@ class Migration(SchemaMigration):
             'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'last_actions': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
+            'last_chat_message': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '75', 'blank': 'True'}),
             'last_col': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'last_direction': ('django.db.models.fields.CharField', [], {'default': "'down'", 'max_length': '10'}),
+            'last_direction': ('django.db.models.fields.CharField', [], {'default': "'south'", 'max_length': '10', 'blank': 'True'}),
             'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'last_row': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'row': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'stamina': ('django.db.models.fields.IntegerField', [], {'default': '20'}),
+            'stamina': ('django.db.models.fields.IntegerField', [], {'default': '10'}),
             'team': ('django.db.models.fields.CharField', [], {'max_length': '5', 'blank': 'True'}),
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'})
+        },
+        u'game.announcement': {
+            'Meta': {'object_name': 'Announcement'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'text': ('django.db.models.fields.CharField', [], {'max_length': '75'})
+        },
+        u'game.log': {
+            'Meta': {'object_name': 'Log'},
+            'col': ('django.db.models.fields.IntegerField', [], {}),
+            'has_flag': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'row': ('django.db.models.fields.IntegerField', [], {}),
+            'team': ('django.db.models.fields.CharField', [], {'max_length': '5'})
         },
         u'game.square': {
             'Meta': {'object_name': 'Square'},

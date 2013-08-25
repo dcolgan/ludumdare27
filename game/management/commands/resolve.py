@@ -7,6 +7,7 @@ class Command(BaseCommand):
     help = 'Run this command whenever 2 minutes go by.'
 
     def handle(self, *args, **options):
+        Announcement.objects.all().delete()
 
         RED_START = { 'col': 14, 'row': 14 }
         BLUE_START = { 'col': 36, 'row': 61 }
@@ -34,6 +35,8 @@ class Command(BaseCommand):
             else:
                 all_actions[account.id] = ['rest']*10
 
+            account.last_chat_message = account.chat_message
+            account.chat_message = ''
             account.last_actions = account.actions
             account.last_col = account.col
             account.last_row = account.row
@@ -64,20 +67,73 @@ class Command(BaseCommand):
                         if account.direction == 'south':
                             account.row += 1
 
+                        # Give flags to those who should have them
+                        square = get_object_or_None(Square, col=account.col, row=account.row)
+                        if square != None:
+                            if TILES[square.tile] == 'red-flag' and account.team == 'blue':
+                                account.has_flag = True
+                            if TILES[square.tile] == 'blue-flag' and account.team == 'red':
+                                account.has_flag = True
+
+                            if (account.has_flag and square.col < 25 and account.team == 'red') or (account.has_flag and square.col >= 25 and account.team == 'blue'):
+                                account.has_flag = False
+                                account.flags_gotten += 1
+                                Announcement.objects.create(text='%s gets a flag for %s' % (account.username, account.get_team_display()))
+
                     if this_action_name == 'run':
+
+                        # Factor this into a function sometime
                         if account.direction == 'west':
-                            account.col -= 2
+                            account.col -= 1
                         if account.direction == 'east':
-                            account.col += 2
+                            account.col += 1
                         if account.direction == 'north':
-                            account.row -= 2
+                            account.row -= 1
                         if account.direction == 'south':
-                            account.row += 2
+                            account.row += 1
+
+                        # Give flags to those who should have them
+                        square = get_object_or_None(Square, col=account.col, row=account.row)
+                        if square != None:
+                            if TILES[square.tile] == 'red-flag' and account.team == 'blue':
+                                account.has_flag = True
+                            if TILES[square.tile] == 'blue-flag' and account.team == 'red':
+                                account.has_flag = True
+
+                            if (account.has_flag and square.col < 25 and account.team == 'red') or (account.has_flag and square.col >= 25 and account.team == 'blue'):
+                                account.has_flag = False
+                                account.flags_gotten += 1
+                                Announcement.objects.create(text='%s gets a flag for %s' % (account.username, account.get_team_display()))
+
+                        if account.direction == 'west':
+                            account.col -= 1
+                        if account.direction == 'east':
+                            account.col += 1
+                        if account.direction == 'north':
+                            account.row -= 1
+                        if account.direction == 'south':
+                            account.row += 1
+
+                        # Give flags to those who should have them
+                        square = get_object_or_None(Square, col=account.col, row=account.row)
+                        if square != None:
+                            if TILES[square.tile] == 'red-flag' and account.team == 'blue':
+                                account.has_flag = True
+                            if TILES[square.tile] == 'blue-flag' and account.team == 'red':
+                                account.has_flag = True
+
+                            if (account.has_flag and square.col < 25 and account.team == 'red') or (account.has_flag and square.col >= 25 and account.team == 'blue'):
+                                account.has_flag = False
+                                account.flags_gotten += 1
+                                Announcement.objects.create(text='%s gets a flag for %s' % (account.username, account.get_team_display()))
+
+
 
                     if this_action_name in ['north', 'south', 'east', 'west']:
                         account.direction = this_action_name
 
                     account.save()
+
 
                 if account.col not in player_locations:
                     player_locations[account.col] = {}

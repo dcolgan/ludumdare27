@@ -26,7 +26,7 @@ class AccountSerializer(serializers.ModelSerializer):
     password = PasswordField()
     class Meta:
         model = Account
-        exclude = ('email', 'stamina')
+        exclude = ('email',)
 
 #class UnitSerializer(serializers.ModelSerializer):
 #    owner_color = serializers.Field(source='owner.color')

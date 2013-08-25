@@ -7,29 +7,55 @@ GAME = {
   game: function() {
     var gameViewModel;
     gameViewModel = function() {
-      var vm;
+      var typingTimer, vm;
       vm = this;
       vm.actions = ko.observableArray([]);
       vm.account = ko.observable();
       vm.otherPlayers = ko.observableArray();
-      vm.secondsRemaining = ko.observable(10);
       vm.chosenActions = ko.observableArray([]);
+      vm.secondsRemaining = ko.computed(function() {
+        var action, total, _i, _len, _ref;
+        total = 10;
+        _ref = vm.chosenActions();
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          action = _ref[_i];
+          total -= action.seconds;
+        }
+        return total;
+      });
+      vm.staminaRemaining = ko.computed(function() {
+        var action, total, _i, _len, _ref;
+        if (vm.account()) {
+          total = vm.account().stamina;
+          _ref = vm.chosenActions();
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            action = _ref[_i];
+            total += action.stamina;
+          }
+          if (total > 10) {
+            total = 10;
+          }
+          return total;
+        } else {
+          return 0;
+        }
+      });
       vm.chooseAction = function(data, event) {
         var thisAction;
         thisAction = data;
-        if (vm.secondsRemaining() - thisAction.seconds >= 0) {
+        if (vm.secondsRemaining() - thisAction.seconds >= 0 && vm.staminaRemaining() + thisAction.stamina >= 0) {
           return $.ajax({
             url: '/api/action/' + data.which + '/',
             method: 'POST',
             dataType: 'json',
             success: function(response) {
               vm.chosenActions.push(_.cloneDeep(thisAction));
-              vm.secondsRemaining(vm.secondsRemaining() - thisAction.seconds);
               return vm.addPlayerMovementArrows();
             }
           });
         }
       };
+      vm.currentChatMessage = ko.observable('');
       vm.cancelAction = function(data, event) {
         var movePosition;
         movePosition = vm.chosenActions.indexOf(data);
@@ -38,8 +64,7 @@ GAME = {
           method: 'POST',
           dataType: 'json',
           success: function(response) {
-            vm.secondsRemaining(vm.secondsRemaining() + data.seconds);
-            vm.chosenActions.remove(data);
+            vm.chosenActions.splice(movePosition, vm.chosenActions().length);
             return vm.addPlayerMovementArrows();
           }
         });
@@ -47,17 +72,30 @@ GAME = {
       vm.currentTime = ko.observable(new Date());
       vm.clockDisplay = ko.computed(function() {
         var seconds;
-        seconds = vm.currentTime().getSeconds() % 30;
-        seconds = 30 - seconds;
+        seconds = vm.currentTime().getSeconds();
+        seconds = 60 - seconds;
         if (seconds < 10) {
           seconds = '0' + (seconds + '');
         }
         return '0:' + seconds;
       });
+      vm.clockSeconds = ko.computed(function() {
+        return vm.currentTime().getSeconds();
+      });
+      vm.doneTypingChat = function() {
+        return $.ajax({
+          url: '/api/update-chat/',
+          method: 'POST',
+          dataType: 'json',
+          data: {
+            'message': vm.currentChatMessage()
+          }
+        });
+      };
       setInterval((function() {
         vm.currentTime(new Date());
         return $('title').text('Next in: ' + vm.clockDisplay());
-      }), 1000);
+      }), 300);
       vm.getActionButtonContent = function(icon) {
         return '<span class="glyphicon ' + icon + '"></span> ';
       };
@@ -147,7 +185,7 @@ GAME = {
         return _results;
       };
       vm.addOthersMovementArrows = function() {
-        var a, action, actionName, curCol, curDir, curRow, otherPlayer, prevDir, thisPlayersActions, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _results;
+        var $square, a, action, actionName, curCol, curDir, curRow, otherPlayer, prevDir, thisPlayersActions, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _results;
         $('.other-arrow').removeClass().addClass('other-arrow');
         _ref = vm.otherPlayers();
         _results = [];
@@ -241,7 +279,12 @@ GAME = {
               }
             }
           }
-          _results.push($('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-player').addClass(otherPlayer.team).addClass(otherPlayer.direction));
+          $square = $('[data-col="' + curCol + '"][data-row="' + curRow + '"]');
+          $square.find('.other-player').addClass(otherPlayer.team).addClass(otherPlayer.direction);
+          if (otherPlayer.has_flag) {
+            $square.find('.other-player').addClass('flag');
+          }
+          _results.push($square.find('.other-player-name').text(otherPlayer.username + ' (' + otherPlayer.flags_gotten + 'f,' + otherPlayer.enemies_tagged + 't)'));
         }
         return _results;
       };
@@ -271,22 +314,29 @@ GAME = {
                 action = _ref2[_l];
                 if (action.which === actionName) {
                   vm.chosenActions.push(_.cloneDeep(action));
-                  vm.secondsRemaining(vm.secondsRemaining() - action.seconds);
                   break;
                 }
               }
             }
           }
+          vm.currentChatMessage(vm.account().chat_message);
           vm.addPlayerMovementArrows();
           return vm.addOthersMovementArrows();
         }
+      });
+      typingTimer = null;
+      $('.chat-entry').keyup(function() {
+        clearTimeout(typingTimer);
+        return typingTimer = setTimeout(vm.doneTypingChat, 1000);
       });
       return null;
     };
     ko.applyBindings(new gameViewModel);
     return $('.actions-panel').on('mouseover mouseout', '.btn', function() {
       $(this).toggleClass('btn-success');
-      return $(this).toggleClass('btn-danger');
+      $(this).toggleClass('btn-danger');
+      $(this).nextAll('.btn').toggleClass('btn-success');
+      return $(this).nextAll('.btn').toggleClass('btn-danger');
     });
   }
 };

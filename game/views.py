@@ -11,6 +11,7 @@ from game.serializers import *
 from game.forms import *
 from util.functions import *
 from django.contrib.auth import authenticate, login
+from django.db.models import Count, Min, Sum, Avg
 
 from rest_framework.generics import *
 from rest_framework.decorators import api_view
@@ -30,6 +31,21 @@ def home(request):
         return HttpResponseRedirect(reverse('game'))
     return render(request, 'home.html', locals())
 
+def how_to_play(request):
+    return render(request, 'how-to-play.html', locals())
+
+def leaderboards(request):
+    top_taggers = Account.objects.order_by('-enemies_tagged')[:20]
+    top_flag_getters = Account.objects.order_by('-flags_gotten')[:20]
+
+    red_flags = Account.objects.filter(team='red').aggregate(red_flags=Sum('flags_gotten'))['red_flags']
+    blue_flags = Account.objects.filter(team='blue').aggregate(blue_flags=Sum('flags_gotten'))['blue_flags']
+
+    red_tags = Account.objects.filter(team='red').aggregate(red_tags=Sum('enemies_tagged'))['red_tags']
+    blue_tags = Account.objects.filter(team='blue').aggregate(blue_tags=Sum('enemies_tagged'))['blue_tags']
+
+    return render(request, 'leaderboards.html', locals())
+
 def create_account(request):
     if request.method == 'POST':
         form = CreateAccountForm(request.POST)
@@ -37,9 +53,16 @@ def create_account(request):
             form.save()
             account = authenticate(username=request.POST['username'],
                                     password=request.POST['password1'])
-            account.col = 24
-            account.row = 37
             account.team = random.choice(['red', 'blue'])
+            if account.team == 'red':
+                account.col = 20
+                account.row = 37
+            else:
+                account.col = 30
+                account.row = 37
+
+            account.last_col = account.col
+            account.last_row = account.row
             account.save()
             login(request, account)
 
@@ -51,7 +74,7 @@ def create_account(request):
             #        'domain': settings.SITE_DOMAIN,
             #        'account': account,
             #    })
-            return HttpResponseRedirect(reverse('game'))
+            return HttpResponseRedirect(reverse('how-to-play'))
     else:
         form = CreateAccountForm()
     return render(request, 'create-account.html', locals())
@@ -59,12 +82,15 @@ def create_account(request):
 @login_required
 def game(request):
     rows = []
-    span = 7
+    col_span = 10
+    row_span = 8
 
-    for row in range(request.user.row-span, request.user.row+span+1):
+    announcements = Announcement.objects.all()
+
+    for row in range(request.user.row-row_span, request.user.row+row_span+1):
         squares = (Square.objects.
-            filter(col__gte=request.user.col-span).
-            filter(col__lte=request.user.col+span).
+            filter(col__gte=request.user.col-col_span).
+            filter(col__lte=request.user.col+col_span).
             filter(row=row).
             order_by('col'))
         rows.append(squares)
@@ -97,13 +123,20 @@ def api_action(request, action):
         current_actions = request.user.actions.split(',')
 
     total_seconds = 0
+    prev_actions_stamina = 0
     for current_action in current_actions:
-        print current_action
-        total_seconds += get_action_by_name(current_action)['seconds']
+        this_action = get_action_by_name(current_action)
+        total_seconds += this_action['seconds']
+        prev_actions_stamina += this_action['stamina']
 
     if total_seconds + get_action_by_name(action)['seconds'] > 10:
         return Response({
             'error': 'You do not have enough seconds to add that action.'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    if request.user.stamina + prev_actions_stamina + get_action_by_name(action)['stamina'] < 0:
+        return Response({
+            'error': 'You do not have enough stamina to add that action.'
         }, status=status.HTTP_400_BAD_REQUEST)
 
     current_actions.append(action)
@@ -123,10 +156,17 @@ def api_cancel(request, move_position):
             'error': 'Invalid cancel.'
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    del current_actions[move_position]
+    current_actions = current_actions[:move_position] # Delete all moves after this one also
     request.user.actions = ','.join(current_actions)
     request.user.save()
 
+    return Response('')
+
+@login_required
+@api_view(['POST'])
+def api_update_chat(request):
+    request.user.chat_message = request.DATA['message']
+    request.user.save()
 
     return Response('')
 
@@ -134,13 +174,14 @@ def api_cancel(request, move_position):
 @api_view(['GET'])
 def api_initial_load(request):
 
-    span = 7
+    col_span = 10
+    row_span = 8
     other_players = (
         Account.objects.
-            filter(col__gte=request.user.col-span).
-            filter(col__lte=request.user.col+span).
-            filter(row__gte=request.user.row-span).
-            filter(row__lte=request.user.row+span).
+            filter(col__gte=request.user.col-col_span).
+            filter(col__lte=request.user.col+col_span).
+            filter(row__gte=request.user.row-row_span).
+            filter(row__lte=request.user.row+row_span).
             exclude(pk=request.user.id)
     )
 

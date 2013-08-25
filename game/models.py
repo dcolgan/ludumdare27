@@ -25,15 +25,17 @@ class Account(AbstractBaseUser, PermissionsMixin):
     row = models.IntegerField(null=True, blank=True)
     last_col = models.IntegerField(null=True, blank=True)
     last_row = models.IntegerField(null=True, blank=True)
-    last_direction = models.CharField(max_length=10, choices=DIRECTIONS, default='south')
-    direction = models.CharField(max_length=10, choices=DIRECTIONS, default='south')
+    last_direction = models.CharField(max_length=10, choices=DIRECTIONS, blank=True, default='south')
+    direction = models.CharField(max_length=10, choices=DIRECTIONS, blank=True, default='south')
+    last_chat_message = models.CharField(max_length=75, blank=True, default='')
+    chat_message = models.CharField(max_length=75, blank=True, default='')
 
     flags_gotten = models.IntegerField(default=0)
     enemies_tagged = models.IntegerField(default=0)
 
     actions = models.CharField(max_length=255, default='', blank=True)
     last_actions = models.CharField(max_length=255, default='', blank=True)
-    stamina = models.IntegerField(default=20)
+    stamina = models.IntegerField(default=10)
 
 
     is_staff = models.BooleanField(default=False, help_text='Designates whether the user can log into this admin site.')
@@ -79,6 +81,22 @@ def get_action_by_name(which):
         if action['which'] == which:
             return action
 
+
+TILES = [
+    None,
+    'grass', 'water', 'corn', 'impassable', 'impassable', None, None, None, None, None,
+    'grass', 'impassable', 'grass', 'grass', None, None, None, None, None, None,
+    'road', 'road', 'red-flag', 'blue-flag', None, None, None, None, None, None,
+    'road', 'road', 'water', 'water', None, None, None, None, None, None,
+    'road', 'road', 'water', 'water', None, None, None, None, None, None,
+    'road', 'road', None, None, None, None, None, None, None, None,
+    'road', 'road', None, None, None, None, None, None, None, None,
+    'road', 'road', None, None, None, None, None, None, None, None,
+    'road', 'road', None, None, None, None, None, None, None, None,
+    None, None, None, None, None, None, None, None, None, None,
+
+]
+
 #class SquareOccupiedException(Exception):
 #    pass
 #class InvalidPlacementException(Exception):
@@ -117,3 +135,18 @@ class Square(models.Model):
         return str(32 * (self.tile-1) % 320 * -1) + 'px'
     def get_css_offset_y(self):
         return str(32 * (self.tile-1) / 320 * 32 * -1) + 'px'
+
+
+class Log(models.Model):
+    TEAMS = (
+        ('red', 'Red'),
+        ('blue', 'Blue'),
+    )
+    col = models.IntegerField()
+    row = models.IntegerField()
+    team = models.CharField(max_length=5, choices=TEAMS)
+    has_flag = models.BooleanField(default=False)
+
+
+class Announcement(models.Model):
+    text = models.CharField(max_length=75)

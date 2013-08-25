@@ -13,13 +13,28 @@ GAME =
             vm.account = ko.observable()
             vm.otherPlayers = ko.observableArray()
 
-            vm.secondsRemaining = ko.observable(10)
             vm.chosenActions = ko.observableArray([])
+
+            vm.secondsRemaining = ko.computed ->
+                total = 10
+                for action in vm.chosenActions()
+                    total -= action.seconds
+                return total
+
+            vm.staminaRemaining = ko.computed ->
+                if vm.account()
+                    total = vm.account().stamina
+                    for action in vm.chosenActions()
+                        total += action.stamina
+                    if total > 10 then total = 10
+                    return total
+                else
+                    return 0
 
 
             vm.chooseAction = (data, event) ->
                 thisAction = data
-                if vm.secondsRemaining() - thisAction.seconds >= 0
+                if vm.secondsRemaining() - thisAction.seconds >= 0 and vm.staminaRemaining() + thisAction.stamina >= 0
                     
                     $.ajax({
                         url: '/api/action/' + data.which + '/'
@@ -27,9 +42,10 @@ GAME =
                         dataType: 'json'
                         success: (response) ->
                             vm.chosenActions.push(_.cloneDeep(thisAction))
-                            vm.secondsRemaining(vm.secondsRemaining()-thisAction.seconds)
                             vm.addPlayerMovementArrows()
                     })
+
+            vm.currentChatMessage = ko.observable('')
 
 
             vm.cancelAction = (data, event) ->
@@ -39,8 +55,7 @@ GAME =
                     method: 'POST'
                     dataType: 'json'
                     success: (response) ->
-                        vm.secondsRemaining(vm.secondsRemaining()+data.seconds)
-                        vm.chosenActions.remove(data)
+                        vm.chosenActions.splice(movePosition, vm.chosenActions().length)
                         vm.addPlayerMovementArrows()
                 })
 
@@ -60,16 +75,41 @@ GAME =
                 #        secDisplay = '0' + (secDisplay+'')
                 #    return minDisplay + ':' + secDisplay
 
-                seconds = vm.currentTime().getSeconds() % 30
-                seconds = 30 - seconds
+                seconds = vm.currentTime().getSeconds()
+                seconds = 60 - seconds
                 if seconds < 10
                     seconds = '0' + (seconds+'')
                 return '0:' + seconds
 
+            vm.clockSeconds = ko.computed ->
+                # Get the time until the next 2 minute interval
+                #seconds = ((vm.currentTime().getMinutes() % 2) * 60) + vm.currentTime().getSeconds()
+
+                #remaining = 120 - seconds
+                #
+                #if remaining == 120
+                #    return '2:00'
+                #else
+                #    minDisplay = Math.floor(remaining/60)
+                #    secDisplay = remaining % 60
+                #    if secDisplay < 10
+                #        secDisplay = '0' + (secDisplay+'')
+                #    return minDisplay + ':' + secDisplay
+                return vm.currentTime().getSeconds()
+
+
+            vm.doneTypingChat = ->
+                $.ajax({
+                    url: '/api/update-chat/'
+                    method: 'POST'
+                    dataType: 'json'
+                    data: { 'message': vm.currentChatMessage() }
+                })
+
             setInterval((->
                 vm.currentTime(new Date())
                 $('title').text('Next in: ' + vm.clockDisplay())
-            ), 1000)
+            ), 300)
             
             vm.getActionButtonContent = (icon) ->
                 return '<span class="glyphicon ' + icon + '"></span> '
@@ -208,7 +248,11 @@ GAME =
                                 $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-arrow').addClass(prevDir + '-' + curDir)
 
                     # Add the other player graphic
-                    $('[data-col="' + curCol + '"][data-row="' + curRow + '"]').find('.other-player').addClass(otherPlayer.team).addClass(otherPlayer.direction)
+                    $square = $('[data-col="' + curCol + '"][data-row="' + curRow + '"]')
+                    $square.find('.other-player').addClass(otherPlayer.team).addClass(otherPlayer.direction)
+                    if otherPlayer.has_flag
+                        $square.find('.other-player').addClass('flag')
+                    $square.find('.other-player-name').text(otherPlayer.username + ' (' + otherPlayer.flags_gotten + 'f,' + otherPlayer.enemies_tagged + 't)')
 
 
             $.ajax({
@@ -229,11 +273,16 @@ GAME =
                             for action in vm.actions()
                                 if action.which == actionName
                                     vm.chosenActions.push(_.cloneDeep(action))
-                                    vm.secondsRemaining(vm.secondsRemaining() - action.seconds)
                                     break
+                    vm.currentChatMessage(vm.account().chat_message)
                     vm.addPlayerMovementArrows()
                     vm.addOthersMovementArrows()
             })
+
+            typingTimer = null
+            $('.chat-entry').keyup ->
+                clearTimeout(typingTimer)
+                typingTimer = setTimeout(vm.doneTypingChat, 1000)
 
 
             null
@@ -244,6 +293,8 @@ GAME =
         $('.actions-panel').on 'mouseover mouseout', '.btn', ->
             $(@).toggleClass('btn-success')
             $(@).toggleClass('btn-danger')
+            $(@).nextAll('.btn').toggleClass('btn-success')
+            $(@).nextAll('.btn').toggleClass('btn-danger')
 
 
 $ ->
