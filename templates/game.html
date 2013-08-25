@@ -7,12 +7,10 @@
 .navbar {
     margin-bottom: 4px !important;
 }
-{% if rows.0.count < 21 %}
-    {% if rows.0.0.col < 25 %}
-        .board-row {
-            float: right;
-        }
-    {% endif %}
+{% if request.user.col < 25 %}
+    .board-row {
+        float: right;
+    }
 {% endif %}
 </style>
 {% endblock %}
@@ -61,34 +59,34 @@
         <div class="col-md-7">
             <div class="board-overlay"></div>
             <div class="board">
-            {% for row in rows %}
-                <div class="board-row">
-                    {% for square in row %}
-                        <div class="square" style="
-                            background-position-x: {{ square.get_css_offset_x }};
-                            background-position-y: {{ square.get_css_offset_y }}"
+                {% for row in rows %}
+                    <div class="board-row">
+                        {% for square in row %}
+                            <div class="square" style="
+                                background-position-x: {{ square.get_css_offset_x }};
+                                background-position-y: {{ square.get_css_offset_y }}"
 
-                            data-bind="
-                            attr: {
-                                'data-col': {{ square.col }},
-                                'data-row': {{ square.row }}
-                            }
-                            ">
-                            {% if square.col == request.user.col and square.row == request.user.row %}
-                            <div class="player-name">{{ request.user.username }} ({{ request.user.flags_gotten }}f,{{ request.user.enemies_tagged }}t)</div>
-                            <div class="player {{ request.user.direction }} {{ request.user.team }}{% if request.user.has_flag %} flag{% endif %}">
-                                </div>
-                            {% endif %}
-                            <div class="other-player-name"></div>
-                            <div class="other-player"></div>
-                            <div class="arrow"></div>
-                            <div class="other-arrow"></div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endfor %}
-            <input class="form-control chat-entry" placeholder="Type chat messages here to be said during the next 10 seconds" type="text" data-bind="value: $root.currentChatMessage, valueUpdate: 'keyup'" maxlength="75" />
+                                data-bind="
+                                attr: {
+                                    'data-col': {{ square.col }},
+                                    'data-row': {{ square.row }}
+                                }
+                                ">
+                                {% if square.col == request.user.col and square.row == request.user.row %}
+                                <div class="player-name">{{ request.user.username }} ({{ request.user.flags_gotten }}f,{{ request.user.enemies_tagged }}t)</div>
+                                <div class="player {{ request.user.direction }} {{ request.user.team }}{% if request.user.has_flag %} flag{% endif %}">
+                                    </div>
+                                {% endif %}
+                                <div class="other-player-name"></div>
+                                <div class="other-player"></div>
+                                <div class="arrow"></div>
+                                <div class="other-arrow"></div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
             </div>
+            <input class="form-control chat-entry" placeholder="Type chat messages here to be said during the next 10 seconds" type="text" data-bind="value: $root.currentChatMessage, valueUpdate: 'keyup'" maxlength="75" />
 
         </div>
         <div class="col-md-2 sidebar" style="padding-left: 40px">

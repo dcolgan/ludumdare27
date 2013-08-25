@@ -45,9 +45,10 @@ h1, h2, h3, h4, h5, .navbar-brand {
 
 .board-overlay {
     position: absolute;
+    border: 2px solid #333;
     z-index: 1000;
-    width: 672px;
-    height: 544px;
+    width: 676px;
+    height: 548px;
     background-image: url(/static/images/ld27-grid.png);
 }
 
@@ -61,10 +62,12 @@ h1, h2, h3, h4, h5, .navbar-brand {
 }
 
 .chat-entry {
-    margin-top: 40px !important;
+    margin-top: 8px !important;
+    width: 676px !important;
 }
 
 .board-row {
+    height: 32px;
     clear: both;
     .square {
         width: 32px;
@@ -90,13 +93,14 @@ h1, h2, h3, h4, h5, .navbar-brand {
 
 .player-name, .other-player-name {
     position: absolute;
-    margin-left: -20px;
+    margin-left: -30px;
     margin-top: -20px;
     color: white;
     text-shadow: -1px -1px 1px #000, 1px -1px 1px #000, -1px 1px 1px #000, 1px 1px 1px #000;
 }
 .player-name {
     z-index: 150;
+    font-weight: bold;
 }
 .other-player-name {
     z-index: 140;

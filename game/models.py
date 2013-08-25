@@ -29,6 +29,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     direction = models.CharField(max_length=10, choices=DIRECTIONS, blank=True, default='south')
     last_chat_message = models.CharField(max_length=75, blank=True, default='')
     chat_message = models.CharField(max_length=75, blank=True, default='')
+    inactive_turns = models.IntegerField(default=0)
 
     flags_gotten = models.IntegerField(default=0)
     enemies_tagged = models.IntegerField(default=0)
@@ -110,6 +111,9 @@ TILES = [
 #class ObjectManager(models.Manager):
 #    def method(self):
 #        pass
+
+RED_START = { 'col': 14, 'row': 14 }
+BLUE_START = { 'col': 36, 'row': 61 }
 
     
 

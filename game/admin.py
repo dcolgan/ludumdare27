@@ -58,7 +58,7 @@ class AccountAdmin(UserAdmin):
     # that reference specific fields on auth.User.
     list_display = ('username', 'email', 'is_superuser', 'last_login', 'date_joined')
     fieldsets = (
-        (None, {'fields': ('username', 'email', 'password', 'col', 'row', 'last_col', 'last_row', 'actions', 'last_actions', 'team', 'direction', 'last_direction', 'chat_message', 'last_chat_message', 'stamina', 'has_flag')}),
+        (None, {'fields': ('username', 'email', 'password', 'col', 'row', 'last_col', 'last_row', 'actions', 'last_actions', 'team', 'direction', 'last_direction', 'chat_message', 'last_chat_message', 'stamina', 'has_flag', 'inactive_turns')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )

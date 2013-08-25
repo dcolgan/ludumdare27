@@ -9,9 +9,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         Announcement.objects.all().delete()
 
-        RED_START = { 'col': 14, 'row': 14 }
-        BLUE_START = { 'col': 36, 'row': 61 }
-
         all_actions = {}
         player_locations = {}
         for account in Account.objects.all():
@@ -29,11 +26,13 @@ class Command(BaseCommand):
 
                 if len(this_accounts_actions) < 10:
                     for i in range(10 - len(this_accounts_actions)):
-                        this_accounts_actions.append('rest')
+                        this_accounts_actions.append('noop')
                 all_actions[account.id] = this_accounts_actions
 
+                account.inactive_turns = 0
             else:
-                all_actions[account.id] = ['rest']*10
+                all_actions[account.id] = ['noop']*10
+                account.inactive_turns += 1
 
             account.last_chat_message = account.chat_message
             account.chat_message = ''
@@ -51,7 +50,7 @@ class Command(BaseCommand):
         for second in range(10):
             for account in Account.objects.all():
                 this_action_name = all_actions[account.id][second]
-                if this_action_name != 'walk-start':
+                if this_action_name != 'walk-start' and this_action_name != 'noop':
 
                     # Figure stamina for this action
                     this_action = get_action_by_name(this_action_name)
@@ -143,31 +142,41 @@ class Command(BaseCommand):
                 if account.row not in player_locations[account.col]:
                     player_locations[account.col][account.row] = []
 
-                player_locations[account.col][account.row].append(account)
+                if account not in player_locations[account.col][account.row]:
+                    player_locations[account.col][account.row].append(account)
 
         print 'Action resolutions finished'
 
-#        print 'Action resolutions finished'
-#
-#        for row in range(75):
-#            for col in range(50):
-#                players_in_this_square = player_locations[col][row]
-#                if len(players_in_this_square) > 2:
-#                    for account in players_in_this_square:
-#                        for other_account in players_in_this_square:
-#                            if account != other_account:
-#                                if account.team != other_account.team:
-#                                    if col < 25:
-#                                        if account.team == 'blue':
-#                                            account.col = BLUE_START['col']
-#                                            account.row = BLUE_START['row']
-#                                        if other_account.team == 'blue':
-#                                            account.col = BLUE_START['col']
-#                                            account.row = BLUE_START['row']
-#                                    else:
-#                                        if account.team == 'red':
-#                                            account.col = RED_START['col']
-#                                            account.row = RED_START['row']
-#                                        if other_account.team == 'red':
-#                                            account.col = RED_START['col']
-#                                            account.row = RED_START['row']
+        for row in range(75):
+            for col in range(50):
+                if player_locations.has_key(col):
+                    if player_locations[col].has_key(row):
+                        players_in_this_square = player_locations[col][row]
+                        if len(players_in_this_square) >= 2:
+                            seen = {}
+                            for account in players_in_this_square:
+                                for other_account in players_in_this_square:
+                                    if account != other_account and (not seen.has_key(str(account.id) + '|' + str(other_account.id))) and (not seen.has_key(str(other_account.id) + '|' + str(account.id))):
+                                        if account.team != other_account.team:
+                                            if col < 25:
+                                                if account.team == 'blue':
+                                                    account.col = BLUE_START['col']
+                                                    account.row = BLUE_START['row']
+                                                    other_account.enemies_tagged += 1
+                                                if other_account.team == 'blue':
+                                                    other_account.col = BLUE_START['col']
+                                                    other_account.row = BLUE_START['row']
+                                                    account.enemies_tagged += 1
+                                            else:
+                                                if account.team == 'red':
+                                                    account.col = RED_START['col']
+                                                    account.row = RED_START['row']
+                                                    other_account.enemies_tagged += 1
+                                                if other_account.team == 'red':
+                                                    other_account.col = RED_START['col']
+                                                    other_account.row = RED_START['row']
+                                                    account.enemies_tagged += 1
+                                            account.save()
+                                            other_account.save()
+                                            seen[str(account.id) + '|' + str(other_account.id)] = True
+                                            seen[str(other_account.id) + '|' + str(account.id)] = True

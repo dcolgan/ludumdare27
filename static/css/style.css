@@ -38,9 +38,10 @@ h5,
 }
 .board-overlay {
   position: absolute;
+  border: 2px solid #333;
   z-index: 1000;
-  width: 672px;
-  height: 544px;
+  width: 676px;
+  height: 548px;
   background-image: url(/static/images/ld27-grid.png);
 }
 .board {
@@ -52,9 +53,11 @@ h5,
   background-color: #333;
 }
 .chat-entry {
-  margin-top: 40px !important;
+  margin-top: 8px !important;
+  width: 676px !important;
 }
 .board-row {
+  height: 32px;
   clear: both;
 }
 .board-row .square {
@@ -72,13 +75,14 @@ h5,
 .player-name,
 .other-player-name {
   position: absolute;
-  margin-left: -20px;
+  margin-left: -30px;
   margin-top: -20px;
   color: white;
   text-shadow: -1px -1px 1px #000000, 1px -1px 1px #000000, -1px 1px 1px #000000, 1px 1px 1px #000000;
 }
 .player-name {
   z-index: 150;
+  font-weight: bold;
 }
 .other-player-name {
   z-index: 140;

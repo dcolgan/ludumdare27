@@ -17,6 +17,7 @@ HOSTNAME = socket.gethostname()
 FILEPATH = os.path.abspath(__file__)
 
 VERSION = 0.7
+TURNS_TILL_DEACTIVATION = 4
 
 DEBUG = True
 DATABASES = {

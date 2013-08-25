@@ -19,6 +19,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
+import settings
+
 from django.utils import simplejson
 import random
 import math
@@ -55,11 +57,11 @@ def create_account(request):
                                     password=request.POST['password1'])
             account.team = random.choice(['red', 'blue'])
             if account.team == 'red':
-                account.col = 20
-                account.row = 37
+                account.col = RED_START['col']
+                account.row = RED_START['row']
             else:
-                account.col = 30
-                account.row = 37
+                account.col = BLUE_START['col']
+                account.row = BLUE_START['row']
 
             account.last_col = account.col
             account.last_row = account.row
@@ -84,6 +86,18 @@ def game(request):
     rows = []
     col_span = 10
     row_span = 8
+
+    # If the player hasn't moved in a while, reset them back to the beginning
+    if request.user.inactive_turns >= settings.TURNS_TILL_DEACTIVATION:
+        request.user.inactive_turns = 0
+        if request.user.team == 'red':
+            request.user.col = RED_START['col']
+            request.user.row = RED_START['row']
+        if request.user.team == 'blue':
+            request.user.col = BLUE_START['col']
+            request.user.row = BLUE_START['row']
+        request.user.stamina = 10
+        request.user.save()
 
     announcements = Announcement.objects.all()
 
@@ -141,6 +155,7 @@ def api_action(request, action):
 
     current_actions.append(action)
     request.user.actions = ','.join(current_actions)
+
     request.user.save()
 
     return Response('')
@@ -178,6 +193,7 @@ def api_initial_load(request):
     row_span = 8
     other_players = (
         Account.objects.
+            filter(inactive_turns__lt=settings.TURNS_TILL_DEACTIVATION).
             filter(col__gte=request.user.col-col_span).
             filter(col__lte=request.user.col+col_span).
             filter(row__gte=request.user.row-row_span).
