@@ -14,27 +14,45 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-md-2 sidebar">
-            {% if request.user.is_authenticated %}
-            <a class="navbar-brand" href="{% url 'game' %}">Ludum Dare 27: The Game&nbsp;</a>
-            {% else %}
-            <a class="navbar-brand" href="{% url 'home' %}">Ludum Dare 27: The Game&nbsp;</a>
-            {% endif %}
-            <ul class="nav navbar-nav pull-right">
+        <div class="col-md-3 sidebar">
+            <a href="{% url 'game' %}"><img src="{{ STATIC_URL }}images/logo.png" alt="" /></a>
+            <ul>
                 {% if request.user.is_authenticated %}
                 <li><a href="{% url 'logout' %}">Log Out</a></li>
                 {% else %}
                 <li><a href="{% url 'login' %}">Log In</a></li>
                 {% endif %}
             </ul>
+
+            <h4>Next 10 seconds in:</h4>
+            <div class="clock-display" data-bind="text: clockDisplay"></div>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-7">
+            <div class="board-overlay"></div>
             <div class="board">
             {% for row in rows %}
                 <div class="board-row">
                     {% for square in row %}
-                        <div class="square">
-                            {{ square.tile }}
+                        <div class="square" style="
+                            background-position-x: {{ square.get_css_offset_x }};
+                            background-position-y: {{ square.get_css_offset_y }}"
+
+                            data-bind="
+                            attr: {
+                                'data-col': {{ square.col }},
+                                'data-row': {{ square.row }}
+                            }
+                            ">
+                            {% if square.col == request.user.col and square.row == request.user.row %}
+                                <div class="player {{ request.user.direction }} {{ request.user.team }}">
+                                </div>
+                            {% endif %}
+                            <div class="other-player">
+                            </div>
+                            <div class="arrow">
+                            </div>
+                            <div class="other-arrow">
+                            </div>
                         </div>
                     {% endfor %}
                 </div>
@@ -43,21 +61,26 @@
 
         </div>
         <div class="col-md-2 sidebar">
-            <button data-bind="click: chooseAction" type="button" class="btn btn-lg btn-block btn-primary btn-action" data-seconds="1" data-action="walk">Walk (1s)</button>
-            <button data-bind="click: chooseAction" type="button" class="btn btn-lg btn-block btn-primary btn-action" data-seconds="1" data-action="run">Run (1s, 2st)</button>
-            <button data-bind="click: chooseAction" type="button" class="btn btn-lg btn-block btn-primary btn-action" data-seconds="1" data-action="left">Turn Left (1s)</button>
-            <button data-bind="click: chooseAction" type="button" class="btn btn-lg btn-block btn-primary btn-action" data-seconds="1" data-action="right">Turn Right (1s)</button>
-            <button data-bind="click: chooseAction" type="button" class="btn btn-lg btn-block btn-primary btn-action" data-seconds="2" data-action="reverse">Turn Around (2s)</button>
+            <!-- ko foreach: actions -->
+            <button type="button" class="btn btn-block btn-primary btn-action" data-bind="
+                click: $root.chooseAction,
+                html: $root.getActionButtonContent(icon) + name,
+                attr: {
+                    'data-action': which,
+                    'data-seconds': seconds,
+                    'data-stamina': stamina
+                }
 
+                "><span data-bind=""></span></button>
+            <!-- /ko -->
             <hr />
-            <h4>Actions for the next 10 seconds:</h4>
+            <h4 data-bind="visible: $root.chosenActions().length > 0">Actions for the next 10 seconds:</h4>
 
             <div class="actions-panel" data-bind="foreach: chosenActions">
-                <button class="btn btn-lg btn-block btn-success" data-bind="
-                    text: name,
+                <button class="btn btn-block btn-success" data-bind="
+                    html: $root.getActionButtonContent(icon) + name,
                     click: $root.cancelAction
                     ">
-                    
                 </button>
                  
             </div>

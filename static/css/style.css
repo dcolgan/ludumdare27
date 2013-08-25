@@ -20,13 +20,157 @@ body {
 .no-bottom-margin {
   margin-bottom: 0 !important;
 }
+.board-overlay {
+  position: absolute;
+  z-index: 1000;
+  width: 480px;
+  height: 480px;
+  background-image: url(/static/images/ld27-grid.png);
+}
+.board {
+  width: 480px;
+  height: 480px;
+}
 .board-row {
   clear: both;
-  width: 848px;
 }
 .board-row .square {
-  width: 48px;
-  height: 48px;
+  width: 32px;
+  height: 32px;
   float: left;
   background-color: green;
+}
+.clock-display {
+  font-size: 32px;
+  padding: 20px;
+  text-align: center;
+}
+.square {
+  background-image: url(/static/images/ld27-tileset.png);
+}
+.player,
+.other-player {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+}
+.player.red.south,
+.other-player.red.south {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -128px -32px;
+}
+.player.red.north,
+.other-player.red.north {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -128px -64px;
+}
+.player.red.east,
+.other-player.red.east {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -128px -96px;
+}
+.player.red.west,
+.other-player.red.west {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -128px -128px;
+}
+.player.blue.south,
+.other-player.blue.south {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -160px -32px;
+}
+.player.blue.north,
+.other-player.blue.north {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -160px -64px;
+}
+.player.blue.east,
+.other-player.blue.east {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -160px -96px;
+}
+.player.blue.west,
+.other-player.blue.west {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -160px -128px;
+}
+.player {
+  z-index: 200;
+}
+.other-player {
+  z-index: 190;
+}
+.arrow,
+.other-arrow {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+}
+.arrow.north-south,
+.other-arrow.north-south,
+.arrow.south-north,
+.other-arrow.south-north {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -64px -160px;
+}
+.arrow.east-west,
+.other-arrow.east-west,
+.arrow.west-east,
+.other-arrow.west-east {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -96px -160px;
+}
+.arrow.west-end,
+.other-arrow.west-end {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -128px -160px;
+}
+.arrow.north-end,
+.other-arrow.north-end {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -160px -160px;
+}
+.arrow.east-end,
+.other-arrow.east-end {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -160px -192px;
+}
+.arrow.south-end,
+.other-arrow.south-end {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -128px -192px;
+}
+.arrow.south-east,
+.other-arrow.south-east,
+.arrow.east-south,
+.other-arrow.east-south {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -64px -192px;
+}
+.arrow.west-south,
+.other-arrow.west-south,
+.arrow.south-west,
+.other-arrow.south-west {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -96px -192px;
+}
+.arrow.north-west,
+.other-arrow.north-west,
+.arrow.west-north,
+.other-arrow.west-north {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -96px -224px;
+}
+.arrow.north-east,
+.other-arrow.north-east,
+.arrow.east-north,
+.other-arrow.east-north {
+  background-image: url(/static/images/ld27-tileset.png);
+  background-position: -64px -224px;
+}
+.arrow {
+  z-index: 100;
+}
+.other-arrow {
+  z-index: 90;
 }

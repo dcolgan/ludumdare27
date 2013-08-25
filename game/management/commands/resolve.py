@@ -4,89 +4,112 @@ import random
 
 class Command(BaseCommand):
     args = ''
-    help = 'Run this command whenever the turn is over.'
+    help = 'Run this command whenever 2 minutes go by.'
 
     def handle(self, *args, **options):
-        day_setting = Setting.objects.get(name='Current Day')
-        day_setting.value = str(int(day_setting.value) + 1)
-        day_setting.save()
 
-        print 'Generating new units'
-        self.generate_units_from_resources()
+        RED_START = { 'col': 14, 'row': 14 }
+        BLUE_START = { 'col': 36, 'row': 61 }
 
-        #print 'Attacking walls'
-        #self.attack_walls()
+        all_actions = {}
+        player_locations = {}
+        for account in Account.objects.all():
+            if account.actions != '':
+                this_accounts_actions = []
+                actions = account.actions.split(',')
 
-        print 'Resolving battles'
-        self.resolve_battles()
+                for action in actions:
+                    if action == 'walk':
+                        this_accounts_actions.append('walk-start')
+                        this_accounts_actions.append('walk')
 
-        print 'Assigning squares\' ownership'
-        self.assign_squares_ownership()
+                    else:
+                        this_accounts_actions.append(action)
 
-        print 'Reticulating splines'
+                if len(this_accounts_actions) < 10:
+                    for i in range(10 - len(this_accounts_actions)):
+                        this_accounts_actions.append('rest')
+                all_actions[account.id] = this_accounts_actions
 
-        print 'ALL DONE'
+            else:
+                all_actions[account.id] = ['rest']*10
 
-    def generate_units_from_resources(self):
-        for square in Square.objects.all():
+            account.last_actions = account.actions
+            account.last_col = account.col
+            account.last_row = account.row
+            account.last_direction = account.direction
+            account.actions = ''
+            account.save()
 
-            # If the square is owned and has a resource, we will be generating a unit
-            if square.resource_amount > 0 and square.owner != None:
-                found = False
-                for unit in square.units.all():
-                    if unit.owner == square.owner:
-                        square.resource_amount -= 1
-                        # If there's a battle going on, place the unit on the square
-                        if square.units.count() > 1:
-                            unit.amount += 1
-                            unit.save()
-                        # Otherwise just put the unit into the unplaced units
-                        else:
-                            square.owner.unplaced_units += 1
-                            square.owner.save()
+        print 'Action hash setup complete.'
 
-                        square.save()
-                        found = True
-                        break
-                if not found:
-                    # There are no units on the square, so add a new one
-                    square.owner.unplaced_units += 1
-                    square.owner.save()
-                    square.resource_amount -= 1
-                    square.save()
+        print all_actions
 
-    def resolve_battles(self):
-        for square in Square.objects.all():
-            units_list = list(square.units.all())
-            while square.units.count() > 1:
+        for second in range(10):
+            for account in Account.objects.all():
+                this_action_name = all_actions[account.id][second]
+                if this_action_name != 'walk-start':
 
-                loser = random.choice(units_list)
-                loser.amount -= 1
-                if loser.amount == 0:
-                    loser.delete()
+                    # Figure stamina for this action
+                    this_action = get_action_by_name(this_action_name)
+                    account.stamina += this_action['stamina']
 
-            for unit in units_list:
-                unit.save()
+                    if this_action_name == 'walk':
+                        if account.direction == 'west':
+                            account.col -= 1
+                        if account.direction == 'east':
+                            account.col += 1
+                        if account.direction == 'north':
+                            account.row -= 1
+                        if account.direction == 'south':
+                            account.row += 1
 
-            # TODO make it so you can tell how many units each player lost
+                    if this_action_name == 'run':
+                        if account.direction == 'west':
+                            account.col -= 2
+                        if account.direction == 'east':
+                            account.col += 2
+                        if account.direction == 'north':
+                            account.row -= 2
+                        if account.direction == 'south':
+                            account.row += 2
 
-            #print 'On square (%d, %d), ' % (square.col, square.row),
-            #for i, unit in enumerate(square.units.all()):
-            #    if unit != winning_unit:
-            #        print '%s loses (%d units, %.3f) ' % (unit.owner.leader_name, unit.amount, battle_scores[i]),
-            #        unit.amount -= 1
-            #        if unit.amount == 0:
-            #            unit.delete()
-            #            print
-            #        else:
-            #            unit.save()
-            #    else:
-            #        print '%s wins (%d units, %.3f) ' % (winning_unit.owner.leader_name, winning_unit.amount, battle_scores[winner_idx]),
-            #print
+                    if this_action_name in ['north', 'south', 'east', 'west']:
+                        account.direction = this_action_name
 
+                    account.save()
 
-    def assign_squares_ownership(self):
-        for square in Square.objects.all():
-            if square.units.count() == 1:
-                square.owner = square.units.all()[0].owner
-                square.save()
+                if account.col not in player_locations:
+                    player_locations[account.col] = {}
+                
+                if account.row not in player_locations[account.col]:
+                    player_locations[account.col][account.row] = []
+
+                player_locations[account.col][account.row].append(account)
+
+        print 'Action resolutions finished'
+
+#        print 'Action resolutions finished'
+#
+#        for row in range(75):
+#            for col in range(50):
+#                players_in_this_square = player_locations[col][row]
+#                if len(players_in_this_square) > 2:
+#                    for account in players_in_this_square:
+#                        for other_account in players_in_this_square:
+#                            if account != other_account:
+#                                if account.team != other_account.team:
+#                                    if col < 25:
+#                                        if account.team == 'blue':
+#                                            account.col = BLUE_START['col']
+#                                            account.row = BLUE_START['row']
+#                                        if other_account.team == 'blue':
+#                                            account.col = BLUE_START['col']
+#                                            account.row = BLUE_START['row']
+#                                    else:
+#                                        if account.team == 'red':
+#                                            account.col = RED_START['col']
+#                                            account.row = RED_START['row']
+#                                        if other_account.team == 'red':
+#                                            account.col = RED_START['col']
+#                                            account.row = RED_START['row']

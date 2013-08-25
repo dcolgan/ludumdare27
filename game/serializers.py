@@ -26,7 +26,7 @@ class AccountSerializer(serializers.ModelSerializer):
     password = PasswordField()
     class Meta:
         model = Account
-        fields = ('id', 'username', 'password')
+        exclude = ('email', 'stamina')
 
 #class UnitSerializer(serializers.ModelSerializer):
 #    owner_color = serializers.Field(source='owner.color')
@@ -42,9 +42,6 @@ class AccountSerializer(serializers.ModelSerializer):
 #    class Meta:
 #        model = Square
 #
-#class MoveSerializer(serializers.ModelSerializer):
-#    class Meta:
-#        model = Move
 
 
 

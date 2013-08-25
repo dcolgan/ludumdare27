@@ -25,12 +25,24 @@ body {
 }
 
 
+.board-overlay {
+    position: absolute;
+    z-index: 1000;
+    width: 480px;
+    height: 480px;
+    background-image: url(/static/images/ld27-grid.png);
+}
+
+.board {
+    width: 480px;
+    height: 480px;
+}
+
 .board-row {
     clear: both;
-    width: 848px;
     .square {
-        width: 48px;
-        height: 48px;
+        width: 32px;
+        height: 32px;
         float: left;
         background-color: green;
     }
@@ -40,4 +52,112 @@ body {
 }
 
 .sidebar {
+}
+
+.clock-display {
+    font-size: 32px;
+    padding: 20px;
+    text-align: center;
+}
+
+.square {
+    background-image: url(/static/images/ld27-tileset.png);
+}
+
+.player, .other-player {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    &.red.south {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -128px -32px;
+    }
+    &.red.north {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -128px -64px;
+    }
+    &.red.east {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -128px -96px;
+    }
+    &.red.west {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -128px -128px;
+    }
+    &.blue.south {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -160px -32px;
+    }
+    &.blue.north {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -160px -64px;
+    }
+    &.blue.east {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -160px -96px;
+    }
+    &.blue.west {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -160px -128px;
+    }
+}
+.player {
+    z-index: 200;
+}
+.other-player {
+    z-index: 190;
+}
+
+
+.arrow, .other-arrow {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    &.north-south, &.south-north {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -64px -160px;
+    }
+    &.east-west, &.west-east {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -96px -160px;
+    }
+    &.west-end {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -128px -160px;
+    }
+    &.north-end {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -160px -160px;
+    }
+    &.east-end {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -160px -192px;
+    }
+    &.south-end {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -128px -192px;
+    }
+    &.south-east, &.east-south {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -64px -192px;
+    }
+    &.west-south, &.south-west {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -96px -192px;
+    }
+    &.north-west, &.west-north {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -96px -224px;
+    }
+    &.north-east, &.east-north {
+        background-image: url(/static/images/ld27-tileset.png);
+        background-position: -64px -224px;
+    }
+}
+
+.arrow {
+    z-index: 100;
+}
+.other-arrow {
+    z-index: 90;
 }

@@ -37,6 +37,10 @@ def create_account(request):
             form.save()
             account = authenticate(username=request.POST['username'],
                                     password=request.POST['password1'])
+            account.col = 24
+            account.row = 37
+            account.team = random.choice(['red', 'blue'])
+            account.save()
             login(request, account)
 
             #send_templated_mail(
@@ -47,7 +51,7 @@ def create_account(request):
             #        'domain': settings.SITE_DOMAIN,
             #        'account': account,
             #    })
-            return HttpResponseRedirect(reverse('settings'))
+            return HttpResponseRedirect(reverse('game'))
     else:
         form = CreateAccountForm()
     return render(request, 'create-account.html', locals())
@@ -55,13 +59,15 @@ def create_account(request):
 @login_required
 def game(request):
     rows = []
-    for row in range(request.user.row-7, request.user.row+8):
+    span = 7
+
+    for row in range(request.user.row-span, request.user.row+span+1):
         squares = (Square.objects.
-            filter(col__gte=request.user.col-7).
-            filter(col__lte=request.user.col+7).
-            filter(row=request.user.row+7).
+            filter(col__gte=request.user.col-span).
+            filter(col__lte=request.user.col+span).
+            filter(row=row).
             order_by('col'))
-        rows.append(rows)
+        rows.append(squares)
 
     return render(request, 'game.html', locals())
 
@@ -82,68 +88,65 @@ def api_email_existence(request, email):
     taken = (get_object_or_None(Account, email=email) != None)
     return Response({ 'taken': taken })
 
-#@login_required
-#@api_view(['GET'])
-#def api_sector(request, col, row, width, height):
-#    try:
-#        col = int(col)
-#        row = int(row)
-#        width = int(width)
-#        height = int(height)
-#    except:
-#        raise Http404
-#
-#    # TODO a lot of this function can be computed on the turn change and then cached, do this if we get a bunch of traffic
-#    # TODO make this instead limit it to a few screens beyond where the furthest person is
-#    if (col > MAX_SECTOR_X * SECTOR_SIZE or
-#       col < MIN_SECTOR_X * SECTOR_SIZE or
-#       row > MAX_SECTOR_Y * SECTOR_SIZE or
-#       row < MIN_SECTOR_Y * SECTOR_SIZE):
-#        return Response({
-#            'error': 'I really don\'t feel like fetching the map that far out.'
-#        }, status=status.HTTP_400_BAD_REQUEST)
-#
-#    if width > 200 or height > 200:
-#        return Response({
-#            'error': 'Yo dog, you can\'t seriously have a screen that big.  If you do, let the admin know though and I\'ll increase the max screen size.'
-#        }, status=status.HTTP_400_BAD_REQUEST)
-#
-#    if width < 1 or height < 1:
-#        return Response({
-#            'error': 'What is this, a quantum computer?  Your screen size must be expressed in positive numbers.'
-#        }, status=status.HTTP_400_BAD_REQUEST)
-#
-#    squares = Square.objects.get_region(col, row, width, height)
-#
-#    is_initial = (
-#        Unit.objects.filter(owner=request.user).count() == 0 and
-#        Square.objects.filter(owner=request.user).count() == 0
-#    )
-#
-#    return Response(SquareSerializer(squares, many=True).data)
+@login_required
+@api_view(['POST'])
+def api_action(request, action):
+    if request.user.actions == '':
+        current_actions = []
+    else:
+        current_actions = request.user.actions.split(',')
+
+    total_seconds = 0
+    for current_action in current_actions:
+        print current_action
+        total_seconds += get_action_by_name(current_action)['seconds']
+
+    if total_seconds + get_action_by_name(action)['seconds'] > 10:
+        return Response({
+            'error': 'You do not have enough seconds to add that action.'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    current_actions.append(action)
+    request.user.actions = ','.join(current_actions)
+    request.user.save()
+
+    return Response('')
+
+@login_required
+@api_view(['POST'])
+def api_cancel(request, move_position):
+    move_position = int(move_position)
+    current_actions = request.user.actions.split(',')
+
+    if current_actions != '' and (move_position < 0 or move_position >= len(current_actions)):
+        return Response({
+            'error': 'Invalid cancel.'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    del current_actions[move_position]
+    request.user.actions = ','.join(current_actions)
+    request.user.save()
+
+
+    return Response('')
 
 @login_required
 @api_view(['GET'])
 def api_initial_load(request):
-    #moves = Move.objects.filter(player=request.user).filter(turn=current_turn)
+
+    span = 7
+    other_players = (
+        Account.objects.
+            filter(col__gte=request.user.col-span).
+            filter(col__lte=request.user.col+span).
+            filter(row__gte=request.user.row-span).
+            filter(row__lte=request.user.row+span).
+            exclude(pk=request.user.id)
+    )
 
     return Response({
-        #'moves': MoveSerializer(moves, many=True).data,
+        'action_data': ACTIONS,
+        'user_actions': request.user.actions,
         'account': AccountSerializer(request.user).data,
+        'other_players': AccountSerializer(other_players, many=True).data,
     })
-    
-#@login_required
-#@api_view(['POST'])
-#def api_square_unit_action(request, src_col, src_row, dest_col, dest_row, kind, amount):
-#    try:
-#        src_col = int(src_col)
-#        src_row = int(src_row)
-#        dest_col = int(dest_col)
-#        dest_row = int(dest_row)
-#    except:
-#        raise Http404
-#
-#    if new_move.is_valid():
-#        new_move.save()
-#    else:
-#        return Response({'error': new_move.error}, status=status.HTTP_400_BAD_REQUEST)

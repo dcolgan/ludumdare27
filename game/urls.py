@@ -14,8 +14,8 @@ urlpatterns = patterns('game.views',
     #url(r'^profile/$', 'profile', name='profile'),
     #url(r'^profile/(?P<account_id>\d+)/$', 'profile', name='profile'),
 
-    #url(r'^api/sector/(?P<col>[0-9-]+)/(?P<row>[0-9-]+)/(?P<width>[0-9]+)/(?P<height>[0-9]+)/$', 'api_sector', name='api-sector'),
-    #url(r'^api/square/(?P<col>[0-9-]+)/(?P<row>[0-9-]+)/(?P<kind>move|attack|city)/(?P<amount>\d)/$', 'api_square_unit_action', name='api-square-unit-action'),
+    url(r'^api/action/(?P<action>rest|walk|run|north|south|east|west)/$', 'api_action', name='api-action'),
+    url(r'^api/cancel/(?P<move_position>\d+)/$', 'api_cancel', name='api-cancel'),
 
     url(r'^api/initial-load/$', 'api_initial_load', name='api-initial-load'),
 
