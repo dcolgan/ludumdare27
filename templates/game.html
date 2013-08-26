@@ -65,8 +65,7 @@
                     <div class="board-row">
                         {% for square in row %}
                             <div class="square" style="
-                                background-position-x: {{ square.get_css_offset_x }};
-                                background-position-y: {{ square.get_css_offset_y }}"
+                                background-position: {{ square.get_css_offset_x }} {{ square.get_css_offset_y }}"
 
                                 data-bind="
                                 attr: {
