@@ -237,7 +237,7 @@ class Command(BaseCommand):
         for account in Account.objects.filter(inactive_turns__lt=settings.TURNS_TILL_DEACTIVATION):
             if account.team == 'red':
                 color = (255, 0, 0)
-            elif terrain == 'blue':
+            elif account.team == 'blue':
                 color = (0, 0, 255)
 
             im.putpixel((account.col, account.row), color)
