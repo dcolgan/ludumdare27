@@ -86,7 +86,7 @@ def get_action_by_name(which):
 TILES = [
     None,
     'grass', 'water', 'corn', 'rocks', 'trees', None, None, None, None, None,
-    'grass', 'shrubbery', 'grass', 'grass', None, None, None, None, None, None,
+    'dirt', 'shrubbery', 'grass', 'grass', None, None, None, None, None, None,
     'road', 'road', 'red-flag', 'blue-flag', None, None, None, None, None, None,
     'road', 'road', 'water', 'water', None, None, None, None, None, None,
     'road', 'road', 'water', 'water', None, None, None, None, None, None,

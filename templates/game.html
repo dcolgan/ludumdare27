@@ -38,7 +38,8 @@
 <div class="container-fixed">
     <div class="row">
         <div class="col-md-3 sidebar">
-            <img src="{{ STATIC_URL }}images/level.png" alt="" />
+            <h4>Minimap:</h4>
+            <img class="minimap" src="{{ STATIC_URL }}images/minimap.png" alt="" />
             <h4>Heard in the last 10 seconds:</h4>
             <div class="well" style="height: 156px; overflow-y: scroll;">
                 {% for announcement in announcements %}

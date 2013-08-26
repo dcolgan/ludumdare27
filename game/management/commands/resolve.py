@@ -1,6 +1,18 @@
 from django.core.management.base import BaseCommand, CommandError
 from game.models import *
+import settings
+from PIL import Image
 import random
+
+def hex_to_rgb(value):
+    value = value.lstrip('#')
+    lv = len(value)
+    if lv == 1:
+        v = int(value, 16)*17
+        return v, v, v
+    if lv == 3:
+        return tuple(int(value[i:i+1], 16)*17 for i in range(0, 3))
+    return tuple(int(value[i:i+lv/3], 16) for i in range(0, lv, lv/3))
 
 class Command(BaseCommand):
     args = ''
@@ -44,8 +56,6 @@ class Command(BaseCommand):
             account.save()
 
         print 'Action hash setup complete.'
-
-        print all_actions
 
         for second in range(10):
             for account in Account.objects.all():
@@ -184,3 +194,58 @@ class Command(BaseCommand):
                                             other_account.save()
                                             seen[str(account.id) + '|' + str(other_account.id)] = True
                                             seen[str(other_account.id) + '|' + str(account.id)] = True
+
+
+
+        squares = Square.objects.order_by('row', 'col')
+
+        im = Image.new('RGB', (50, 75), 'black')
+
+        for square in squares:
+            terrain = square.get_terrain_type()
+            if terrain == 'grass':
+                color = (102, 188, 83)
+            elif terrain == 'water':
+                color = (71, 132, 224)
+            elif terrain == 'corn':
+                color = (255, 255, 0)
+            elif terrain == 'rock':
+                color = (160, 160, 160)
+            elif terrain == 'trees':
+                color = (8, 74, 41)
+            elif terrain == 'dirt':
+                color = (205, 115, 32)
+            elif terrain == 'shrubbery':
+                color = (8, 74, 41)
+            elif terrain == 'road':
+                color = (200, 200, 200)
+            elif terrain == 'red-flag':
+                color = (150, 0, 30)
+            elif terrain == 'blue-flag':
+                color = (0, 0, 196)
+
+            if terrain == 'red-flag' or terrain == 'blue-flag':
+                im.putpixel((square.col, square.row), color)
+                im.putpixel((square.col-1, square.row), color)
+                im.putpixel((square.col-1, square.row-1), color)
+                im.putpixel((square.col-1, square.row+1), color)
+
+                im.putpixel((square.col+1, square.row), color)
+            else:
+                im.putpixel((square.col, square.row), color)
+
+        for account in Account.objects.filter(inactive_turns__lt=settings.TURNS_TILL_DEACTIVATION):
+            if account.team == 'red':
+                color = (255, 0, 0)
+            elif terrain == 'blue':
+                color = (0, 0, 255)
+
+            im.putpixel((account.col, account.row), color)
+            im.putpixel((account.col-1, account.row), color)
+            im.putpixel((account.col+1, account.row), color)
+            im.putpixel((account.col, account.row-1), color)
+            im.putpixel((account.col, account.row+1), color)
+           
+        im = im.resize((250, 375), Image.NEAREST)
+
+        im.save('static/images/minimap.png', 'PNG')
